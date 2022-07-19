@@ -15,23 +15,23 @@ public struct User {
         case nitro = 2
     }
 
-    let id: Snowflake
+    public let id: Snowflake
 
-    let username: String
-    let discriminator: String
+    public let username: String
+    public let discriminator: String
 
-    let avatar: String?
+    public let avatar: String?
 
-    let bot: Bool?
-    let system: Bool?
-    let mfaEnabled: Bool?
-    let banner: String?
-    let accentColor: Int?
-    let locale: String?
-    let verified: Bool?
-    let email: String?
+    public let bot: Bool?
+    public let system: Bool?
+    public let mfaEnabled: Bool?
+    public let banner: String?
+    public let accentColor: Int?
+    public let locale: String?
+    public let verified: Bool?
+    public let email: String?
 
-    let flags: Flags?
-    let premiumType: PremiumType?
-    let publicFlags: Flags?
+    public let flags: Flags?
+    public let premiumType: PremiumType?
+    public let publicFlags: Flags?
 }
