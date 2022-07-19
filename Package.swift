@@ -8,8 +8,8 @@ let package = Package(
     products: [
         // Products define the executables and libraries a package produces, and make them visible to other packages.
         .library(
-            name: "swift-discord",
-            targets: ["swift-discord"]),
+            name: "Discord",
+            targets: ["DiscordV10", "Discord"]),
     ],
     dependencies: [
         // Dependencies declare other packages that this package depends on.
@@ -19,10 +19,13 @@ let package = Package(
         // Targets are the basic building blocks of a package. A target can define a module or a test suite.
         // Targets can depend on other targets in this package, and on products in packages this package depends on.
         .target(
-            name: "swift-discord",
+            name: "DiscordV10",
+            dependencies: ["Discord"]),
+        .target(
+            name: "Discord",
             dependencies: []),
         .testTarget(
-            name: "swift-discordTests",
-            dependencies: ["swift-discord"]),
+            name: "DiscordTests",
+            dependencies: ["Discord"]),
     ]
 )
