@@ -2,7 +2,7 @@
 //  User+Flags.swift
 //  
 //
-//  Created by 강재홍 on 2022/07/19.
+//  Created by Jaehong Kang on 2022/07/19.
 //
 
 import Foundation
