@@ -13,7 +13,7 @@ on:
 jobs:
   swift-test:
     strategy:
-      fail-fast: false
+      fail-fast: true
       matrix:
         operating-system: ["macos-11", "macos-12", "ubuntu-18.04", "ubuntu-20.04", "ubuntu-22.04"]
         swift-version: ["5.5.3", "5.6.2"]
@@ -42,7 +42,7 @@ jobs:
           SWIFT_VERSION: ${{ matrix.swift-version }}
   xcode-test:
     strategy:
-      fail-fast: false
+      fail-fast: true
       matrix:
         xcode-version: ["13.2.1", "13.4.1"]
         xcode-destination: [
