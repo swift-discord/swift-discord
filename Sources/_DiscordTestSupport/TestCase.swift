@@ -54,8 +54,7 @@ open class TestCase: XCTestCase {
     open class var oAuth2Credential: OAuth2Credential? {
         guard
             let tokenType = oAuth2TokenType,
-            let accessToken = oAuth2AccessToken,
-            let tokenExpires = oAuth2TokenExpires
+            let accessToken = oAuth2AccessToken
         else {
             return nil
         }
@@ -63,7 +62,7 @@ open class TestCase: XCTestCase {
         return OAuth2Credential(
             tokenType: tokenType,
             accessToken: accessToken,
-            expires: tokenExpires,
+            expires: oAuth2TokenExpires,
             refreshToken: oAuth2RefreshToken,
             scopes: []
         )

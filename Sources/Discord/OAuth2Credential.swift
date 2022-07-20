@@ -38,37 +38,23 @@ extension OAuth2Credential {
     public init(
         tokenType: String,
         accessToken: String,
-        expiresIn: TimeInterval,
+        expiresIn: TimeInterval? = nil,
         expires: Date? = nil,
         refreshToken: String? = nil,
         scopes: OrderedSet<String>
     ) {
         self.tokenType = tokenType
         self.accessToken = accessToken
-        if let expires = expires {
-            self.validityPeriod = DateInterval(
-                start: expires.addingTimeInterval(-expiresIn),
-                end: expires
-            )
-        } else {
+        switch (expiresIn, expires) {
+        case (.some(let expiresIn), .some(let expires)):
+            self.validityPeriod = DateInterval(start: expires.addingTimeInterval(-expiresIn), end: expires)
+        case (.none, .some(let expires)):
+            self.validityPeriod = DateInterval(start: Date.distantPast, end: expires)
+        case (.some(let expiresIn), .none):
             self.validityPeriod = DateInterval(start: Date(), duration: expiresIn)
+        case (.none, .none):
+            self.validityPeriod = DateInterval(start: .distantPast, end: .distantFuture)
         }
-        self.refreshToken = refreshToken
-        self.scopes = scopes
-    }
-}
-
-extension OAuth2Credential {
-    public init(
-        tokenType: String,
-        accessToken: String,
-        expires: Date,
-        refreshToken: String? = nil,
-        scopes: OrderedSet<String>
-    ) {
-        self.tokenType = tokenType
-        self.accessToken = accessToken
-        self.validityPeriod = DateInterval(start: Date.distantPast, end: expires)
         self.refreshToken = refreshToken
         self.scopes = scopes
     }
