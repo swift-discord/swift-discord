@@ -24,7 +24,7 @@ public actor Session {
 }
 
 extension Session {
-    public func updateOAuth2Credential(_ oAuth2Credential: OAuth2Credential) {
+    public func updateOAuth2Credential(_ oAuth2Credential: OAuth2Credential?) {
         self.oAuth2Credential = oAuth2Credential
     }
 }
