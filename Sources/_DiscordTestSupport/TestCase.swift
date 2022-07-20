@@ -24,9 +24,7 @@ open class TestCase: XCTestCase {
         let urlSessionConfiguration = URLSessionConfiguration.default
 
         return Session.Configuration(
-            urlSessionConfiguration: urlSessionConfiguration,
-            oAuth2ClientID: Self.oAuth2ClientID,
-            oAuth2ClientSecret: Self.oAuth2ClientSecret
+            urlSessionConfiguration: urlSessionConfiguration
         )
     }
 
