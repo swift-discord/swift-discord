@@ -23,7 +23,10 @@ extension Session {
 
     public enum OAuth2AuthorizeError: Error {
         case unknown
+        case clientIDNotFound
+        case clientSecretNotFound
         case codeNotFound
+        case refreshTokenNotFound
         case stateMismatch
     }
 
@@ -38,9 +41,13 @@ extension Session {
             throw OAuth2AuthorizeError.unknown
         }
 
+        guard let oAuth2ClientID = configuration.oAuth2ClientID else {
+            throw OAuth2AuthorizeError.clientIDNotFound
+        }
+
         authorizeURLComponents.queryItems = [
             URLQueryItem(name: "response_type", value: responseType.rawValue),
-            URLQueryItem(name: "client_id", value: configuration.oAuth2ClientID),
+            URLQueryItem(name: "client_id", value: oAuth2ClientID),
             URLQueryItem(name: "scope", value: scopes.joined(separator: " ")),
             state.flatMap { URLQueryItem(name: "state", value: $0) },
             URLQueryItem(name: "redirect_uri", value: callbackURL.absoluteString),
@@ -55,6 +62,14 @@ extension Session {
     }
 
     public func updateOAuth2Credential(authorizeCallbackURL: URL, state: String? = nil) async throws {
+        guard let oAuth2ClientID = configuration.oAuth2ClientID else {
+            throw OAuth2AuthorizeError.clientIDNotFound
+        }
+
+        guard let oAuth2ClientSecret = configuration.oAuth2ClientSecret else {
+            throw OAuth2AuthorizeError.clientSecretNotFound
+        }
+
         let callbackURLComponents = URLComponents(url: authorizeCallbackURL, resolvingAgainstBaseURL: true)
 
         let callbackURLQueryItems: [String: String?]? = callbackURLComponents?.queryItems.flatMap {
@@ -83,8 +98,8 @@ extension Session {
         redirectURLComponents?.query = nil
 
         tokenRequestURLComponents.queryItems = [
-            URLQueryItem(name: "client_id", value: configuration.oAuth2ClientID),
-            URLQueryItem(name: "client_secret", value: configuration.oAuth2ClientSecret),
+            URLQueryItem(name: "client_id", value: oAuth2ClientID),
+            URLQueryItem(name: "client_secret", value: oAuth2ClientSecret),
             URLQueryItem(name: "grant_type", value: "authorization_code"),
             URLQueryItem(name: "code", value: code),
             URLQueryItem(name: "redirect_uri", value: redirectURLComponents?.string),
@@ -103,14 +118,26 @@ extension Session {
             throw OAuth2AuthorizeError.unknown
         }
 
+        guard let oAuth2ClientID = configuration.oAuth2ClientID else {
+            throw OAuth2AuthorizeError.clientIDNotFound
+        }
+
+        guard let oAuth2ClientSecret = configuration.oAuth2ClientSecret else {
+            throw OAuth2AuthorizeError.clientSecretNotFound
+        }
+
+        guard let refreshToken = oAuth2Credential?.refreshToken else {
+            throw OAuth2AuthorizeError.refreshTokenNotFound
+        }
+
         var tokenURLRequest = URLRequest(url: tokenURL)
 
         var tokenRequestURLComponents = URLComponents()
         tokenRequestURLComponents.queryItems =  [
-            URLQueryItem(name: "client_id", value: configuration.oAuth2ClientID),
-            URLQueryItem(name: "client_secret", value: configuration.oAuth2ClientSecret),
+            URLQueryItem(name: "client_id", value: oAuth2ClientID),
+            URLQueryItem(name: "client_secret", value: oAuth2ClientSecret),
             URLQueryItem(name: "grant_type", value: "refresh_token"),
-            URLQueryItem(name: "refresh_token", value: oAuth2Credential?.refreshToken),
+            URLQueryItem(name: "refresh_token", value: refreshToken),
         ]
 
         tokenURLRequest.httpMethod = "POST"
