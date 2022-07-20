@@ -14,9 +14,9 @@
         "package": "swift-snowflake",
         "repositoryURL": "https://github.com/sinoru/swift-snowflake",
         "state": {
-          "branch": "develop",
-          "revision": "71287b7909e252e01b1cb7f8b0c3efc8ccd41387",
-          "version": null
+          "branch": null,
+          "revision": "440fa7765e90066a25da535b8b493a5c47bbafb6",
+          "version": "0.0.1"
         }
       }
     ]
