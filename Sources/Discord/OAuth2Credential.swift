@@ -57,3 +57,19 @@ extension OAuth2Credential {
         self.scopes = scopes
     }
 }
+
+extension OAuth2Credential {
+    public init(
+        tokenType: String,
+        accessToken: String,
+        expires: Date,
+        refreshToken: String? = nil,
+        scopes: OrderedSet<String>
+    ) {
+        self.tokenType = tokenType
+        self.accessToken = accessToken
+        self.validityPeriod = DateInterval(start: Date.distantPast, end: expires)
+        self.refreshToken = refreshToken
+        self.scopes = scopes
+    }
+}
