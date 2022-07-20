@@ -16,7 +16,7 @@ extension JSONDecoder {
         return jsonDecoder
     }
 
-    static var discord: JSONDecoder {
+    public static var discord: JSONDecoder {
         let jsonDecoder = JSONDecoder()
         jsonDecoder.keyDecodingStrategy = .convertFromSnakeCase
         jsonDecoder.dateDecodingStrategy = .iso8601

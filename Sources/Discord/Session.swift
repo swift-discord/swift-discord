@@ -33,10 +33,10 @@ extension Session {
 }
 
 extension Session {
-    public nonisolated func data(for request: URLRequest, includesOAuth2Credential: Bool = false) async throws -> (Data, URLResponse) {
+    public func data(for request: URLRequest, includesOAuth2Credential: Bool = false) async throws -> (Data, URLResponse) {
         var request = request
 
-        if includesOAuth2Credential, let oAuth2Credential = await oAuth2Credential {
+        if includesOAuth2Credential, let oAuth2Credential = oAuth2Credential {
             guard oAuth2Credential.validityPeriod.contains(Date()) else {
                 try await refreshOAuth2Credential()
                 return try await data(for: request, includesOAuth2Credential: includesOAuth2Credential)
