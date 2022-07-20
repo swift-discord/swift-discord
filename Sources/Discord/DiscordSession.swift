@@ -8,9 +8,23 @@
 import Foundation
 
 public actor DiscordSession {
+    public nonisolated let configuration: Configuration
+    public private(set) var oAuth2Credential: OAuth2Credential?
+
     nonisolated let urlSession: URLSession
 
-    init(urlSessionConfiguration: URLSessionConfiguration) {
-        self.urlSession = URLSession(configuration: urlSessionConfiguration)
+    public init(configuration: Configuration) {
+        self.configuration = configuration
+        self.urlSession = URLSession(configuration: configuration.urlSessionConfiguration)
+    }
+
+    deinit {
+        urlSession.invalidateAndCancel()
+    }
+}
+
+extension DiscordSession {
+    public func updateOAuth2Credential(_ oAuth2Credential: OAuth2Credential) {
+        self.oAuth2Credential = oAuth2Credential
     }
 }
