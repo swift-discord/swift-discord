@@ -1,5 +1,5 @@
 //
-//  DiscordSession_OAuth2CredentialTests.swift
+//  OAuth2CredentialTests.swift
 //  
 //
 //  Created by Jaehong Kang on 2022/07/20.
@@ -9,7 +9,7 @@ import XCTest
 import OrderedCollections
 @testable import Discord
 
-final class DiscordSession_OAuth2CredentialTests: XCTestCase {
+final class OAuth2CredentialTests: XCTestCase {
     func testDecodeAccessTokenResponse() throws {
         let accessTokenResponse = """
         {
@@ -23,7 +23,7 @@ final class DiscordSession_OAuth2CredentialTests: XCTestCase {
 
         let jsonDecoder = JSONDecoder.oAuth2
 
-        let oAuth2Credential = try jsonDecoder.decode(DiscordSession.OAuth2Credential.self, from: accessTokenResponse)
+        let oAuth2Credential = try jsonDecoder.decode(OAuth2Credential.self, from: accessTokenResponse)
 
         XCTAssertEqual(oAuth2Credential.tokenType, "Bearer")
         XCTAssertEqual(oAuth2Credential.accessToken, "6qrZcUqja7812RVdnEKjpzOL4CvHBFG")
@@ -44,7 +44,7 @@ final class DiscordSession_OAuth2CredentialTests: XCTestCase {
 
         let jsonDecoder = JSONDecoder.oAuth2
 
-        let oAuth2Credential = try jsonDecoder.decode(DiscordSession.OAuth2Credential.self, from: clientCredentialsAccessTokenResponse)
+        let oAuth2Credential = try jsonDecoder.decode(OAuth2Credential.self, from: clientCredentialsAccessTokenResponse)
 
         XCTAssertEqual(oAuth2Credential.tokenType, "Bearer")
         XCTAssertEqual(oAuth2Credential.accessToken, "6qrZcUqja7812RVdnEKjpzOL4CvHBFG")
@@ -112,7 +112,7 @@ final class DiscordSession_OAuth2CredentialTests: XCTestCase {
 
         let jsonDecoder = JSONDecoder.oAuth2
 
-        let oAuth2Credential = try jsonDecoder.decode(DiscordSession.OAuth2Credential.self, from: extendedBotAuthorizationAccessTokenResponse)
+        let oAuth2Credential = try jsonDecoder.decode(OAuth2Credential.self, from: extendedBotAuthorizationAccessTokenResponse)
 
         XCTAssertEqual(oAuth2Credential.tokenType, "Bearer")
         XCTAssertEqual(oAuth2Credential.accessToken, "zMndOe7jFLXGawdlxMOdNvXjjOce5X")
@@ -145,7 +145,7 @@ final class DiscordSession_OAuth2CredentialTests: XCTestCase {
 
         let jsonDecoder = JSONDecoder.oAuth2
 
-        let oAuth2Credential = try jsonDecoder.decode(DiscordSession.OAuth2Credential.self, from: webhookTokenResponse)
+        let oAuth2Credential = try jsonDecoder.decode(OAuth2Credential.self, from: webhookTokenResponse)
 
         XCTAssertEqual(oAuth2Credential.tokenType, "Bearer")
         XCTAssertEqual(oAuth2Credential.accessToken, "GNaVzEtATqdh173tNHEXY9ZYAuhiYxvy")
@@ -167,11 +167,11 @@ final class DiscordSession_OAuth2CredentialTests: XCTestCase {
 
         let jsonDecoder = JSONDecoder.oAuth2
 
-        let oAuth2Credential = try jsonDecoder.decode(DiscordSession.OAuth2Credential.self, from: accessTokenResponse)
+        let oAuth2Credential = try jsonDecoder.decode(OAuth2Credential.self, from: accessTokenResponse)
 
         let encodedOAuth2Credential = try JSONEncoder.oAuth2.encode(oAuth2Credential)
 
-        let oAuth2Credential2 = try jsonDecoder.decode(DiscordSession.OAuth2Credential.self, from: encodedOAuth2Credential)
+        let oAuth2Credential2 = try jsonDecoder.decode(OAuth2Credential.self, from: encodedOAuth2Credential)
 
         XCTAssertEqual(oAuth2Credential, oAuth2Credential2)
     }

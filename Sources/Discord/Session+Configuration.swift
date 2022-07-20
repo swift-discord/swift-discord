@@ -1,5 +1,5 @@
 //
-//  DiscordSession+Configuration.swift
+//  Session+Configuration.swift
 //  
 //
 //  Created by Jaehong Kang on 2022/07/20.
@@ -7,7 +7,7 @@
 
 import Foundation
 
-extension DiscordSession {
+extension Session {
     public struct Configuration: Sendable {
         public let urlSessionConfiguration: URLSessionConfiguration
 

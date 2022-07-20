@@ -1,5 +1,5 @@
 //
-//  DiscordSession.swift
+//  Session.swift
 //  
 //
 //  Created by Jaehong Kang on 2022/07/19.
@@ -7,7 +7,7 @@
 
 import Foundation
 
-public actor DiscordSession {
+public actor Session {
     public nonisolated let configuration: Configuration
     public private(set) var oAuth2Credential: OAuth2Credential?
 
@@ -23,7 +23,7 @@ public actor DiscordSession {
     }
 }
 
-extension DiscordSession {
+extension Session {
     public func updateOAuth2Credential(_ oAuth2Credential: OAuth2Credential) {
         self.oAuth2Credential = oAuth2Credential
     }

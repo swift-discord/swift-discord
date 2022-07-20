@@ -1,5 +1,5 @@
 //
-//  DiscordSession+OAuth2Credential.swift
+//  OAuth2Credential.swift
 //  
 //
 //  Created by Jaehong Kang on 2022/07/20.
@@ -8,27 +8,25 @@
 import Foundation
 import OrderedCollections
 
-extension DiscordSession {
-    public struct OAuth2Credential: Equatable, Hashable {
-        public let tokenType: String
-        public let accessToken: String
+public struct OAuth2Credential: Equatable, Hashable {
+    public let tokenType: String
+    public let accessToken: String
 
-        public let validityPeriod: DateInterval
-        public let refreshToken: String?
+    public let validityPeriod: DateInterval
+    public let refreshToken: String?
 
-        public let scopes: OrderedSet<String>
+    public let scopes: OrderedSet<String>
 
-        public init(tokenType: String, accessToken: String, validityPeriod: DateInterval, refreshToken: String? = nil, scopes: OrderedSet<String>) {
-            self.tokenType = tokenType
-            self.accessToken = accessToken
-            self.validityPeriod = validityPeriod
-            self.refreshToken = refreshToken
-            self.scopes = scopes
-        }
+    public init(tokenType: String, accessToken: String, validityPeriod: DateInterval, refreshToken: String? = nil, scopes: OrderedSet<String>) {
+        self.tokenType = tokenType
+        self.accessToken = accessToken
+        self.validityPeriod = validityPeriod
+        self.refreshToken = refreshToken
+        self.scopes = scopes
     }
 }
 
-extension DiscordSession.OAuth2Credential {
+extension OAuth2Credential {
     public init(tokenType: String, accessToken: String, expiresIn: TimeInterval, expires: Date? = nil, refreshToken: String? = nil, scopes: OrderedSet<String>) {
         self.tokenType = tokenType
         self.accessToken = accessToken
@@ -45,7 +43,7 @@ extension DiscordSession.OAuth2Credential {
     }
 }
 
-extension DiscordSession.OAuth2Credential: Codable {
+extension OAuth2Credential: Codable {
     enum CodingKeys: String, CodingKey {
         case accessToken
         case tokenType
