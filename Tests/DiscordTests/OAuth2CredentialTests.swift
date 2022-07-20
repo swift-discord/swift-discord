@@ -5,11 +5,11 @@
 //  Created by Jaehong Kang on 2022/07/20.
 //
 
-import XCTest
+import _DiscordTestSupport
 import OrderedCollections
 @testable import Discord
 
-final class OAuth2CredentialTests: XCTestCase {
+final class OAuth2CredentialTests: TestCase {
     func testDecodeAccessTokenResponse() throws {
         let accessTokenResponse = """
         {

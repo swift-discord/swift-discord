@@ -32,8 +32,11 @@ let package = Package(
         .target(
             name: "Discord",
             dependencies: [.product(name: "Collections", package: "swift-collections")]),
+        .target(
+            name: "_DiscordTestSupport",
+            dependencies: ["Discord"]),
         .testTarget(
             name: "DiscordTests",
-            dependencies: ["Discord"]),
+            dependencies: ["Discord", "_DiscordTestSupport"]),
     ]
 )
