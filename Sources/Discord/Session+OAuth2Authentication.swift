@@ -15,8 +15,8 @@ extension Session {
         state: String = UUID().uuidString,
         callbackURL: URL,
         prompt: OAuth2AuthorizationPrompt = .consent,
-        presentationContextProvider: ASWebAuthenticationPresentationContextProviding?
-    ) async throws {
+        webAuthenticationSessionHandler: (ASWebAuthenticationSession) -> Bool
+    ) async throws -> Bool {
         guard
             let callbackURLScheme = callbackURL.scheme
         else {
@@ -31,27 +31,32 @@ extension Session {
             prompt: prompt
         )
 
-        let callbackURL: URL = try await withCheckedThrowingContinuation { continuation in
+        let callbackURL: URL? = try await withCheckedThrowingContinuation { continuation in
             let webAuthenticationSession = ASWebAuthenticationSession(
                 url: url,
                 callbackURLScheme: callbackURLScheme
             ) { callbackURL, error in
-                guard let callbackURL = callbackURL else {
-                    continuation.resume(throwing: error!)
+                if let error = error {
+                    continuation.resume(throwing: error)
                     return
                 }
 
                 continuation.resume(returning: callbackURL)
             }
 
-            webAuthenticationSession.presentationContextProvider = presentationContextProvider
-            guard webAuthenticationSession.start() else {
-                continuation.resume(throwing: OAuth2AuthorizeError.unknown)
+            guard webAuthenticationSessionHandler(webAuthenticationSession) else {
+                continuation.resume(returning: nil)
                 return
             }
         }
 
+        guard let callbackURL = callbackURL else {
+            return false
+        }
+
         try await self.updateOAuth2Credential(authorizeCallbackURL: callbackURL, state: state)
+
+        return true
     }
 }
 
