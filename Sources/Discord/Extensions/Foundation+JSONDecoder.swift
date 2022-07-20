@@ -14,4 +14,12 @@ extension JSONDecoder {
 
         return jsonDecoder
     }
+
+    static var discord: JSONDecoder {
+        let jsonDecoder = JSONDecoder()
+        jsonDecoder.keyDecodingStrategy = .convertFromSnakeCase
+        jsonDecoder.dateDecodingStrategy = .iso8601
+
+        return jsonDecoder
+    }
 }
