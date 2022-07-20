@@ -9,8 +9,8 @@ import Foundation
 import Snowflake
 import Discord
 
-public struct User: Sendable {
-    public enum PremiumType: Int, Sendable {
+public struct User: Codable, Sendable {
+    public enum PremiumType: Int, Codable, Sendable {
         case none = 0
         case nitroClassic = 1
         case nitro = 2
