@@ -7,11 +7,11 @@
 
 import Foundation
 #if canImport(FoundationNetworking)
-@preconcurrency import FoundationNetworking
+import FoundationNetworking
 #endif
 
 extension Session {
-    public struct Configuration: Sendable {
+    public struct Configuration {
         public let urlSessionConfiguration: URLSessionConfiguration
 
         public let oAuth2ClientID: String

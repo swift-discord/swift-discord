@@ -7,11 +7,11 @@
 
 import Foundation
 #if canImport(FoundationNetworking)
-@preconcurrency import FoundationNetworking
+import FoundationNetworking
 #endif
 
 public actor Session {
-    public nonisolated let configuration: Configuration
+    public let configuration: Configuration
     public private(set) var oAuth2Credential: OAuth2Credential?
 
     nonisolated let urlSession: URLSession
