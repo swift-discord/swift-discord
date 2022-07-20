@@ -97,4 +97,27 @@ extension Session {
 
         try updateOAuth2Credential(JSONDecoder.oAuth2.decode(OAuth2Credential.self, from: data))
     }
+
+    public func refreshOAuth2Credential() async throws {
+        guard let tokenURL = URL(discordAPIPath: "oauth2/token") else {
+            throw OAuth2AuthorizeError.unknown
+        }
+
+        var tokenURLRequest = URLRequest(url: tokenURL)
+
+        var tokenRequestURLComponents = URLComponents()
+        tokenRequestURLComponents.queryItems =  [
+            URLQueryItem(name: "client_id", value: configuration.oAuth2ClientID),
+            URLQueryItem(name: "client_secret", value: configuration.oAuth2ClientSecret),
+            URLQueryItem(name: "grant_type", value: "refresh_token"),
+            URLQueryItem(name: "refresh_token", value: oAuth2Credential?.refreshToken),
+        ]
+
+        tokenURLRequest.httpMethod = "POST"
+        tokenURLRequest.httpBody = tokenRequestURLComponents.percentEncodedQuery?.data(using: .utf8)
+
+        let (data, _) = try await data(for: tokenURLRequest, includesOAuth2Credential: false)
+
+        try updateOAuth2Credential(JSONDecoder.oAuth2.decode(OAuth2Credential.self, from: data))
+    }
 }

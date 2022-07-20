@@ -37,6 +37,11 @@ extension Session {
         var request = request
 
         if includesOAuth2Credential, let oAuth2Credential = await oAuth2Credential {
+            guard oAuth2Credential.validityPeriod.contains(Date()) else {
+                try await refreshOAuth2Credential()
+                return try await data(for: request, includesOAuth2Credential: includesOAuth2Credential)
+            }
+
             request.setValue([oAuth2Credential.tokenType, oAuth2Credential.accessToken].joined(separator: " "), forHTTPHeaderField: "Authorization")
         }
 
