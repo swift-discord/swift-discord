@@ -1,0 +1,25 @@
+{
+  "object": {
+    "pins": [
+      {
+        "package": "swift-collections",
+        "repositoryURL": "https://github.com/apple/swift-collections.git",
+        "state": {
+          "branch": null,
+          "revision": "48254824bb4248676bf7ce56014ff57b142b77eb",
+          "version": "1.0.2"
+        }
+      },
+      {
+        "package": "swift-snowflake",
+        "repositoryURL": "https://github.com/sinoru/swift-snowflake",
+        "state": {
+          "branch": null,
+          "revision": "440fa7765e90066a25da535b8b493a5c47bbafb6",
+          "version": "0.0.1"
+        }
+      }
+    ]
+  },
+  "version": 1
+}
