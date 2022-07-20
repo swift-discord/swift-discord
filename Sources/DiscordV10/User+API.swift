@@ -23,3 +23,14 @@ extension User {
         return user
     }
 }
+
+extension User {
+    public init(userID: Snowflake, session: Session) async throws {
+        var urlRequest = URLRequest(url: URL(discordAPIPath: "v10/users/\(userID.rawValue)")!)
+        urlRequest.httpMethod = "GET"
+
+        let (data, _) = try await session.data(for: urlRequest, includesOAuth2Credential: true)
+
+        self = try JSONDecoder.discord.decode(User.self, from: data)
+    }
+}
