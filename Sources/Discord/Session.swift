@@ -40,22 +40,16 @@ extension Session {
             request.setValue([oAuth2Credential.tokenType, oAuth2Credential.accessToken].joined(separator: " "), forHTTPHeaderField: "Authorization")
         }
 
-        #if os(iOS) || os(macOS) || os(tvOS) || os(watchOS)
+        #if swift(>=5.6)
         let (data, response) = try await urlSession.data(for: request)
         #else
-        let (data, response) = try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<(Data, URLResponse), Error>) in
-            urlSession.dataTask(with: request) { data, response, error in
-                guard
-                    let data = data,
-                    let response = response
-                else {
-                    continuation.resume(throwing: error!)
-                    return
-                }
-
-                continuation.resume(returning: (data, response))
-            }.resume()
-        }
+        let (data, response) = {
+            if #available(iOS 15.0, macOS 13.0, macCatalyst 15.0, tvOS 15.0, watchOS 8.0, *) {
+                return try await urlSession.data(for: request)
+            } else {
+                return try await urlSession._data(for: request)
+            }
+        }()
         #endif
 
         return (data, response)
