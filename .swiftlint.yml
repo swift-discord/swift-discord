@@ -1,0 +1,49 @@
+disabled_rules:
+  - trailing_comma
+opt_in_rules:
+  - anyobject_protocol
+  - array_init
+  - capture_variable
+  - collection_alignment
+  - contains_over_filter_count
+  - contains_over_filter_is_empty
+  - empty_collection_literal
+  - empty_string
+
+file_length:
+  ignore_comment_only_lines: true
+
+function_body_length:
+  warning: 50
+  error: 125
+
+identifier_name:
+  min_length:
+    warning: 2
+    error: 1
+  max_length:
+    warning: 80
+    error: 100
+  allowed_symbols:
+    - '_'
+
+line_length:
+  warning: 160
+  error: 240
+  ignores_comments: true
+
+nesting:
+  type_level: 2
+  function_level: 3
+
+type_name:
+  min_length:
+    warning: 2
+    error: 1
+  max_length:
+    warning: 80
+    error: 100
+  allowed_symbols:
+    - '_'
+  excluded:
+    - ''
