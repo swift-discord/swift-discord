@@ -5,12 +5,11 @@
 //  Created by Jaehong Kang on 2022/07/20.
 //
 
-#if canImport(AuthenticationServices)
+#if canImport(AuthenticationServices) && !os(tvOS)
 
 import AuthenticationServices
 
 extension Session {
-    @available(tvOS, unavailable)
     public func oAuth2Authorize(
         scopes: OAuth2Credential.Scopes,
         state: String = UUID().uuidString,
