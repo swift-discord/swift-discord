@@ -1,5 +1,5 @@
 //
-//  OAuth2CredentialTests.swift
+//  OAuth2CredentialDecodingTests.swift
 //  
 //
 //  Created by Jaehong Kang on 2022/07/20.
@@ -9,7 +9,7 @@ import _DiscordTestSupport
 import OrderedCollections
 @testable import Discord
 
-final class OAuth2CredentialTests: TestCase {
+final class OAuth2CredentialDecodingTests: TestCase {
     func testDecodeAccessTokenResponse() throws {
         let accessTokenResponse = """
         {
