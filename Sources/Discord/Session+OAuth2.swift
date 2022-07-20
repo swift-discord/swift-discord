@@ -28,7 +28,6 @@ extension Session {
     }
 
     public func oAuth2AuthorizeURL(
-        oAuth2ClientID: String,
         responseType: OAuth2AuthorizationResponseType = .code,
         scopes: OAuth2Credential.Scopes,
         state: String? = nil,
@@ -41,7 +40,7 @@ extension Session {
 
         authorizeURLComponents.queryItems = [
             URLQueryItem(name: "response_type", value: responseType.rawValue),
-            URLQueryItem(name: "client_id", value: oAuth2ClientID),
+            URLQueryItem(name: "client_id", value: configuration.oAuth2ClientID),
             URLQueryItem(name: "scope", value: scopes.joined(separator: " ")),
             state.flatMap { URLQueryItem(name: "state", value: $0) },
             URLQueryItem(name: "redirect_uri", value: callbackURL.absoluteString),
@@ -55,12 +54,7 @@ extension Session {
         return authorizeURL
     }
 
-    public func updateOAuth2Credential(
-        oAuth2ClientID: String,
-        oAuth2ClientSecret: String,
-        authorizeCallbackURL: URL,
-        state: String? = nil
-    ) async throws {
+    public func updateOAuth2Credential(authorizeCallbackURL: URL, state: String? = nil) async throws {
         let callbackURLComponents = URLComponents(url: authorizeCallbackURL, resolvingAgainstBaseURL: true)
 
         let callbackURLQueryItems: [String: String?]? = callbackURLComponents?.queryItems.flatMap {
@@ -89,8 +83,8 @@ extension Session {
         redirectURLComponents?.query = nil
 
         tokenRequestURLComponents.queryItems = [
-            URLQueryItem(name: "client_id", value: oAuth2ClientID),
-            URLQueryItem(name: "client_secret", value: oAuth2ClientSecret),
+            URLQueryItem(name: "client_id", value: configuration.oAuth2ClientID),
+            URLQueryItem(name: "client_secret", value: configuration.oAuth2ClientSecret),
             URLQueryItem(name: "grant_type", value: "authorization_code"),
             URLQueryItem(name: "code", value: code),
             URLQueryItem(name: "redirect_uri", value: redirectURLComponents?.string),

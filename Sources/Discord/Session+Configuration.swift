@@ -14,8 +14,13 @@ extension Session {
     public struct Configuration {
         public let urlSessionConfiguration: URLSessionConfiguration
 
-        public init(urlSessionConfiguration: URLSessionConfiguration) {
+        public let oAuth2ClientID: String
+        public let oAuth2ClientSecret: String
+
+        public init(urlSessionConfiguration: URLSessionConfiguration, oAuth2ClientID: String, oAuth2ClientSecret: String) {
             self.urlSessionConfiguration = urlSessionConfiguration
+            self.oAuth2ClientID = oAuth2ClientID
+            self.oAuth2ClientSecret = oAuth2ClientSecret
         }
     }
 }
