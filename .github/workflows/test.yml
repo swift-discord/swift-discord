@@ -41,7 +41,6 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        operating-system: ["macos-11", "macos-12"]
         xcode-version: ["13.2.1", "13.4.1"]
         xcode-destination: [
           "platform=OS X,arch=x86_64",
@@ -50,9 +49,11 @@ jobs:
           "platform=tvOS Simulator,name=Apple TV,OS=latest",
           "platform=watchOS Simulator,name=Apple Watch Series 6 - 44mm,OS=latest",
         ]
-        exclude:
-          - operating-system: "macos-11"
-            xcode-version: "13.4.1"
+        include:
+          - xcode-version: "13.2.1"
+            operating-system: "macos-11"
+          - xcode-version: "13.4.1"
+            operating-system: "macos-12"
     runs-on: ${{ matrix.operating-system }}
     steps:
       - uses: actions/checkout@v2
