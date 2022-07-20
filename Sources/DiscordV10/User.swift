@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import Snowflake
 import Discord
 
 public struct User: Sendable {

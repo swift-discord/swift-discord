@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import Snowflake
 
 extension JSONEncoder {
     static var oAuth2: JSONEncoder {
@@ -19,6 +20,7 @@ extension JSONEncoder {
         let jsonEncoder = JSONEncoder()
         jsonEncoder.keyEncodingStrategy = .convertToSnakeCase
         jsonEncoder.dateEncodingStrategy = .iso8601
+        jsonEncoder.snowflakeEncodingStrategy = .string
 
         return jsonEncoder
     }
