@@ -10,6 +10,7 @@
 import AuthenticationServices
 
 extension Session {
+    @available(iOS 12.0, macOS 10.15, macCatalyst 13.0, watchOS 6.2, *)
     public func oAuth2Authorize(
         scopes: OAuth2Credential.Scopes,
         state: String = UUID().uuidString,
