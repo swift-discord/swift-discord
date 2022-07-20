@@ -8,7 +8,7 @@
 import Foundation
 
 extension User {
-    public struct Flags: OptionSet {
+    public struct Flags: OptionSet, Sendable {
         public static let staff = Self.init(rawValue: 1 << 0)
         public static let partner = Self.init(rawValue: 1 << 1)
         public static let hypeSquad = Self.init(rawValue: 1 << 2)

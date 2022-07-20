@@ -8,7 +8,7 @@
 import Foundation
 
 extension DiscordSession {
-    public struct Configuration {
+    public struct Configuration: Sendable {
         public let urlSessionConfiguration: URLSessionConfiguration
 
         public let oAuth2ClientID: String

@@ -8,8 +8,8 @@
 import Foundation
 import Discord
 
-public struct User {
-    public enum PremiumType: Int {
+public struct User: Sendable {
+    public enum PremiumType: Int, Sendable {
         case none = 0
         case nitroClassic = 1
         case nitro = 2
