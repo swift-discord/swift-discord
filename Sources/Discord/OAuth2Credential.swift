@@ -9,13 +9,15 @@ import Foundation
 import OrderedCollections
 
 public struct OAuth2Credential: Equatable, Hashable {
+    public typealias Scopes = OrderedSet<String>
+
     public let tokenType: String
     public let accessToken: String
 
     public let validityPeriod: DateInterval
     public let refreshToken: String?
 
-    public let scopes: OrderedSet<String>
+    public let scopes: Scopes
 
     public init(
         tokenType: String,
