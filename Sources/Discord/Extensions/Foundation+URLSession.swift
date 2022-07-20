@@ -31,7 +31,7 @@ extension URLSession {
     #if !os(iOS) && !os(macOS) && !os(tvOS) && !os(watchOS)
     @inlinable
     func data(for request: URLRequest, delegate: (URLSessionTaskDelegate)? = nil) async throws -> (Data, URLResponse) {
-        _data(for: request, delegate: delegate)
+        try await _data(for: request, delegate: delegate)
     }
     #endif
 }
