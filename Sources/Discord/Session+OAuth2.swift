@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import AuthenticationServices
 
 extension Session {
     public enum OAuth2AuthorizationResponseType: String {
