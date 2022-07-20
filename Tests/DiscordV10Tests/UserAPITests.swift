@@ -5,8 +5,6 @@
 //  Created by Jaehong Kang on 2022/07/21.
 //
 
-#if swift(>=5.5)
-
 import _DiscordTestSupport
 @testable import Discord
 @testable import DiscordV10
@@ -61,5 +59,3 @@ final class UserAPITests: TestCase {
         XCTAssertEqual(user.publicFlags, [])
     }
 }
-
-#endif
