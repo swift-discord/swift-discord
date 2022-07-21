@@ -32,6 +32,6 @@ public struct User: Equatable, Hashable, Identifiable, Sendable, Codable {
     public let email: String?
 
     public let flags: Flags?
-    public let premiumType: PremiumType?
+    public let premiumType: Unknown<PremiumType>?
     public let publicFlags: Flags?
 }

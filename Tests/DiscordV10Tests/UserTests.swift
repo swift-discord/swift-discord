@@ -48,7 +48,7 @@ final class UserTests: TestCase {
         XCTAssertEqual(user.email, "nelly@discord.com")
 
         XCTAssertEqual(user.flags, [.hypeSquadOnlineHouse1])
-        XCTAssertEqual(user.premiumType, .nitroClassic)
+        XCTAssertEqual(user.premiumType, .value(.nitroClassic))
         XCTAssertEqual(user.publicFlags, [.hypeSquadOnlineHouse1])
     }
 }
