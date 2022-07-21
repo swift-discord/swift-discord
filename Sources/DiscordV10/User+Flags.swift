@@ -8,7 +8,7 @@
 import Foundation
 
 extension User {
-    public struct Flags: OptionSet, Sendable {
+    public struct Flags: OptionSet, Codable, Sendable {
         public static let staff = Self.init(rawValue: 1 << 0)
         public static let partner = Self.init(rawValue: 1 << 1)
         public static let hypeSquad = Self.init(rawValue: 1 << 2)
@@ -29,21 +29,5 @@ extension User {
         public init(rawValue: Int) {
             self.rawValue = rawValue
         }
-    }
-}
-
-extension User.Flags: Decodable {
-    public init(from decoder: Decoder) throws {
-        let container = try decoder.singleValueContainer()
-
-        self.rawValue = try container.decode(RawValue.self)
-    }
-}
-
-extension User.Flags: Encodable {
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.singleValueContainer()
-
-        try container.encode(rawValue)
     }
 }
