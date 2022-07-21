@@ -6,11 +6,10 @@
 //
 
 import Foundation
-import Snowflake
 import Discord
 
-public struct User: Codable, Sendable {
-    public enum PremiumType: Int, Codable, Sendable {
+public struct User: Equatable, Hashable, Identifiable, Sendable, Codable {
+    public enum PremiumType: Int, Equatable, Hashable, Sendable, Codable {
         case none = 0
         case nitroClassic = 1
         case nitro = 2
@@ -33,6 +32,6 @@ public struct User: Codable, Sendable {
     public let email: String?
 
     public let flags: Flags?
-    public let premiumType: PremiumType?
+    public let premiumType: Unknown<PremiumType>?
     public let publicFlags: Flags?
 }

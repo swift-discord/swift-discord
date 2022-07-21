@@ -21,7 +21,7 @@ final class OAuth2CredentialDecodingTests: TestCase {
         }
         """.data(using: .utf8)!
 
-        let jsonDecoder = JSONDecoder.oAuth2
+        let jsonDecoder = JSONDecoder.discordOAuth2
 
         let oAuth2Credential = try jsonDecoder.decode(OAuth2Credential.self, from: accessTokenResponse)
 
@@ -42,7 +42,7 @@ final class OAuth2CredentialDecodingTests: TestCase {
         }
         """.data(using: .utf8)!
 
-        let jsonDecoder = JSONDecoder.oAuth2
+        let jsonDecoder = JSONDecoder.discordOAuth2
 
         let oAuth2Credential = try jsonDecoder.decode(OAuth2Credential.self, from: clientCredentialsAccessTokenResponse)
 
@@ -110,7 +110,7 @@ final class OAuth2CredentialDecodingTests: TestCase {
         }
         """.data(using: .utf8)!
 
-        let jsonDecoder = JSONDecoder.oAuth2
+        let jsonDecoder = JSONDecoder.discordOAuth2
 
         let oAuth2Credential = try jsonDecoder.decode(OAuth2Credential.self, from: extendedBotAuthorizationAccessTokenResponse)
 
@@ -143,7 +143,7 @@ final class OAuth2CredentialDecodingTests: TestCase {
         }
         """.data(using: .utf8)!
 
-        let jsonDecoder = JSONDecoder.oAuth2
+        let jsonDecoder = JSONDecoder.discordOAuth2
 
         let oAuth2Credential = try jsonDecoder.decode(OAuth2Credential.self, from: webhookTokenResponse)
 
@@ -165,11 +165,11 @@ final class OAuth2CredentialDecodingTests: TestCase {
         }
         """.data(using: .utf8)!
 
-        let jsonDecoder = JSONDecoder.oAuth2
+        let jsonDecoder = JSONDecoder.discordOAuth2
 
         let oAuth2Credential = try jsonDecoder.decode(OAuth2Credential.self, from: accessTokenResponse)
 
-        let encodedOAuth2Credential = try JSONEncoder.oAuth2.encode(oAuth2Credential)
+        let encodedOAuth2Credential = try JSONEncoder.discordOAuth2.encode(oAuth2Credential)
 
         let oAuth2Credential2 = try jsonDecoder.decode(OAuth2Credential.self, from: encodedOAuth2Credential)
 

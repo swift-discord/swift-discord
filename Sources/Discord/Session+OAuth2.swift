@@ -110,7 +110,7 @@ extension Session {
 
         let (data, _) = try await data(for: tokenURLRequest, includesOAuth2Credential: false)
 
-        try updateOAuth2Credential(JSONDecoder.oAuth2.decode(OAuth2Credential.self, from: data))
+        try updateOAuth2Credential(JSONDecoder.discordOAuth2.decode(OAuth2Credential.self, from: data))
     }
 
     public func refreshOAuth2Credential() async throws {
@@ -145,6 +145,6 @@ extension Session {
 
         let (data, _) = try await data(for: tokenURLRequest, includesOAuth2Credential: false)
 
-        try updateOAuth2Credential(JSONDecoder.oAuth2.decode(OAuth2Credential.self, from: data))
+        try updateOAuth2Credential(JSONDecoder.discordOAuth2.decode(OAuth2Credential.self, from: data))
     }
 }

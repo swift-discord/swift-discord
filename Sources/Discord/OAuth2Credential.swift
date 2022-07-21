@@ -6,9 +6,9 @@
 //
 
 import Foundation
-import OrderedCollections
+@preconcurrency import OrderedCollections
 
-public struct OAuth2Credential: Equatable, Hashable {
+public struct OAuth2Credential: Equatable, Hashable, Sendable {
     public typealias Scopes = OrderedSet<String>
 
     public let tokenType: String

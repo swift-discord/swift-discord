@@ -9,7 +9,7 @@ import Foundation
 import Snowflake
 
 extension JSONDecoder {
-    static var oAuth2: JSONDecoder {
+    static var discordOAuth2: JSONDecoder {
         let jsonDecoder = JSONDecoder()
         jsonDecoder.keyDecodingStrategy = .convertFromSnakeCase
 

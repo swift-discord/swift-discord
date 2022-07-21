@@ -1,25 +1,23 @@
 {
-  "object": {
-    "pins": [
-      {
-        "package": "swift-collections",
-        "repositoryURL": "https://github.com/apple/swift-collections.git",
-        "state": {
-          "branch": null,
-          "revision": "48254824bb4248676bf7ce56014ff57b142b77eb",
-          "version": "1.0.2"
-        }
-      },
-      {
-        "package": "swift-snowflake",
-        "repositoryURL": "https://github.com/sinoru/swift-snowflake",
-        "state": {
-          "branch": null,
-          "revision": "440fa7765e90066a25da535b8b493a5c47bbafb6",
-          "version": "0.0.1"
-        }
+  "pins" : [
+    {
+      "identity" : "swift-collections",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/apple/swift-collections.git",
+      "state" : {
+        "revision" : "48254824bb4248676bf7ce56014ff57b142b77eb",
+        "version" : "1.0.2"
       }
-    ]
-  },
-  "version": 1
+    },
+    {
+      "identity" : "swift-snowflake",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/sinoru/swift-snowflake",
+      "state" : {
+        "revision" : "c27f0861253ea4d61f9f4f4a1fcd9343ae5dc4d5",
+        "version" : "0.0.2"
+      }
+    }
+  ],
+  "version" : 2
 }

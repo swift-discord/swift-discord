@@ -15,15 +15,18 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        operating-system: ["macos-11", "macos-12", "ubuntu-18.04", "ubuntu-20.04"]
-        swift-version: ["5.5.3", "5.6.2"]
+        operating-system: ["macos-12", "ubuntu-18.04", "ubuntu-20.04"]
+        swift-version: ["5.6.2"]
+        include:
+          - swift-version: "5.6.2"
+            xcode-version: "13.4.1"
     runs-on: ${{ matrix.operating-system }}
     steps:
       - uses: actions/checkout@v2
       - uses: sinoru/actions-setup-xcode@v2
-        if: ${{ startsWith(matrix.operating-system, 'macos') }}
+        if: ${{ startsWith(matrix.operating-system, 'macos') && matrix.xcode-version }}
         with:
-          xcode-version: "13.2.1"
+          xcode-version: ${{ matrix.xcode-version }}
           apple-id: ${{ secrets.APPLE_ID }}
           apple-id-password: ${{ secrets.APPLE_ID_PASSWORD }}
       - uses: sinoru/actions-setup-swift@v2
@@ -41,7 +44,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        xcode-version: ["13.2.1", "13.4.1"]
+        xcode-version: ["13.4.1"]
         xcode-destination: [
           "platform=OS X,arch=x86_64",
           "platform=OS X,arch=x86_64,variant=Mac Catalyst",
@@ -49,7 +52,10 @@ jobs:
           "platform=tvOS Simulator,name=Apple TV,OS=latest",
           "platform=watchOS Simulator,name=Apple Watch Series 6 - 44mm,OS=latest",
         ]
-    runs-on: macos-12
+        include:
+          - xcode-version: "13.4.1"
+            operating-system: "macos-12"
+    runs-on: ${{ matrix.operating-system }}
     steps:
       - uses: actions/checkout@v2
       - uses: sinoru/actions-setup-xcode@v2

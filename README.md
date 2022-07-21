@@ -1,8 +1,19 @@
 # swift-discord
 
-[![Test](https://github.com/swift-discord/swift-discord/actions/workflows/test.yml/badge.svg)](https://github.com/swift-discord/swift-discord/actions/workflows/test.yml)
+| **main** | **develop** |
+|:---:|:---:|
+| [![Test](https://github.com/swift-discord/swift-discord/actions/workflows/test.yml/badge.svg?branch=main)](https://github.com/swift-discord/swift-discord/actions/workflows/test.yml) | [![Test](https://github.com/swift-discord/swift-discord/actions/workflows/test.yml/badge.svg?branch=develop)](https://github.com/swift-discord/swift-discord/actions/workflows/test.yml) |
 
 A Swift library for Discord API.
+
+## Available APIs
+
+- [/users/@me](Sources/DiscordV10/User+API.swift#L15-L24)
+- [/users/{user.id}](Sources/DiscordV10/User+API.swift#L28-L35)
+- [/users/@me/guilds](Sources/DiscordV10/Guild+API.swift#L15-L24)
+- [/guilds/{guild.id}](Sources/DiscordV10/Guild+API.swift#L28-L35)
+- [/channels/{channel.id}](Sources/DiscordV10/Channel+API.swift#L15-L22)
+- [/guilds/{guild.id}/channels](Sources/DiscordV10/Channel+API.swift#L26-L35)
 
 ## Using **swift-discord** in your project
 
@@ -17,7 +28,7 @@ let package = Package(
   dependencies: [
     .package(
       url: "https://github.com/swift-discord/swift-discord.git", 
-      .upToNextMajor(from: "0.0.1") // or `.upToNextMinor
+      .upToNextMajor(from: "0.0.2") // or `.upToNextMinor
     )
   ],
   targets: [
