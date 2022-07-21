@@ -14,6 +14,8 @@ import NIOWebSocket
 #if canImport(NIOTransportServices)
 import NIOTransportServices
 import Network
+#else
+import NIOFoundationCompat
 #endif
 
 public actor GatewaySession {
