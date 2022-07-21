@@ -16,7 +16,7 @@ let package = Package(
         // Products define the executables and libraries a package produces, and make them visible to other packages.
         .library(
             name: "Discord",
-            targets: ["DiscordV10", "Discord"]),
+            targets: ["Discord", "DiscordV10", "DiscordGateway"]),
     ],
     dependencies: [
         // Dependencies declare other packages that this package depends on.
@@ -32,15 +32,22 @@ let package = Package(
         // Targets are the basic building blocks of a package. A target can define a module or a test suite.
         // Targets can depend on other targets in this package, and on products in packages this package depends on.
         .target(
+            name: "Discord",
+            dependencies: [
+                .product(name: "Collections", package: "swift-collections"),
+                .product(name: "Snowflake", package: "swift-snowflake")
+            ]),
+        .target(
             name: "DiscordV10",
             dependencies: ["Discord"]),
         .target(
-            name: "Discord",
+            name: "DiscordGateway",
             dependencies: [
                 .product(name: "Algorithms", package: "swift-algorithms"),
-                .product(name: "Collections", package: "swift-collections"),
+                "Discord",
                 .product(name: "NIOCore", package: "swift-nio"),
                 .product(name: "NIOPosix", package: "swift-nio"),
+                .product(name: "NIOFoundationCompat", package: "swift-nio"),
                 .product(name: "NIOHTTP1", package: "swift-nio"),
                 .product(name: "NIOWebSocket", package: "swift-nio"),
                 .product(
@@ -57,10 +64,10 @@ let package = Package(
             name: "_DiscordTestSupport",
             dependencies: ["Discord"]),
         .testTarget(
-            name: "DiscordV10Tests",
-            dependencies: ["DiscordV10", "_DiscordTestSupport"]),
-        .testTarget(
             name: "DiscordTests",
             dependencies: ["Discord", "_DiscordTestSupport"]),
+        .testTarget(
+            name: "DiscordV10Tests",
+            dependencies: ["DiscordV10", "_DiscordTestSupport"]),
     ]
 )
