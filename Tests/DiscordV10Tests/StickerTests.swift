@@ -31,8 +31,6 @@ final class StickerTests: XCTestCase {
 
         let sticker = try jsonDecoder.decode(Sticker.self, from: exampleResponse)
 
-        dump(sticker)
-
         XCTAssertEqual(sticker.id, 749054660769218631)
 
         XCTAssertEqual(sticker.packID, 847199849233514549)

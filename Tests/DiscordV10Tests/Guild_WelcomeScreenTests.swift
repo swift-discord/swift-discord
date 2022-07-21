@@ -55,8 +55,6 @@ final class Guild_WelcomeScreenTests: XCTestCase {
 
         let welcomeScreen = try jsonDecoder.decode(Guild.WelcomeScreen.self, from: exampleResponse)
 
-        dump(welcomeScreen)
-
         XCTAssertEqual(
             welcomeScreen.description,
             "Discord Developers is a place to learn about Discord's API, bots, and SDKs and integrations. This is NOT a general Discord support server."
