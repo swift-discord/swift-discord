@@ -28,7 +28,7 @@ let package = Package(
   dependencies: [
     .package(
       url: "https://github.com/swift-discord/swift-discord.git", 
-      .upToNextMajor(from: "0.0.1") // or `.upToNextMinor
+      .upToNextMajor(from: "0.0.2") // or `.upToNextMinor
     )
   ],
   targets: [
