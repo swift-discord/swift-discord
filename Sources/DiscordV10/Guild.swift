@@ -119,7 +119,7 @@ public struct Guild: Equatable, Hashable, Identifiable, Sendable {
     public let approximatePresenceCount: Int?
 
     public let welcomeScreen: WelcomeScreen?
-    
+
     public let nsfwLevel: Unknown<NSFWLevel>?
 
     public let stickers: [Sticker]?
