@@ -16,10 +16,8 @@ jobs:
       fail-fast: true
       matrix:
         operating-system: ["macos-12", "ubuntu-18.04", "ubuntu-20.04"]
-        swift-version: ["5.5.3", "5.6.2"]
+        swift-version: ["5.6.2"]
         include:
-          - swift-version: "5.5.3"
-            xcode-version: "13.2.1"
           - swift-version: "5.6.2"
             xcode-version: "13.4.1"
     runs-on: ${{ matrix.operating-system }}
@@ -46,7 +44,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        xcode-version: ["13.2.1", "13.4.1"]
+        xcode-version: ["13.4.1"]
         xcode-destination: [
           "platform=OS X,arch=x86_64",
           "platform=OS X,arch=x86_64,variant=Mac Catalyst",
@@ -55,8 +53,6 @@ jobs:
           "platform=watchOS Simulator,name=Apple Watch Series 6 - 44mm,OS=latest",
         ]
         include:
-          - xcode-version: "13.2.1"
-            operating-system: "macos-11"
           - xcode-version: "13.4.1"
             operating-system: "macos-12"
     runs-on: ${{ matrix.operating-system }}
