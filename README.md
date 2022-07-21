@@ -12,6 +12,8 @@ A Swift library for Discord API.
 - [/users/{user.id}](Sources/DiscordV10/User+API.swift#L28-L35)
 - [/users/@me/guilds](Sources/DiscordV10/Guild+API.swift#L15-L24)
 - [/guilds/{guild.id}](Sources/DiscordV10/Guild+API.swift#L28-L35)
+- [/channels/{channel.id}](Sources/DiscordV10/Channel+API.swift#L15-L22)
+- [/guilds/{guild.id}/channels](Sources/DiscordV10/Channel+API.swift#L26-L35)
 
 ## Using **swift-discord** in your project
 
