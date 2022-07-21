@@ -11,6 +11,7 @@ import _DiscordTestSupport
 
 final class StickerTests: XCTestCase {
     func testDecodingStickerExample() throws {
+        // swiftlint:disable all
         let exampleResponse = #"""
         {
           "id": "749054660769218631",
@@ -24,6 +25,7 @@ final class StickerTests: XCTestCase {
           "sort_value": 12
         }
         """#.data(using: .utf8)!
+        // swiftlint:enable all
 
         let jsonDecoder = JSONDecoder.discord
 
