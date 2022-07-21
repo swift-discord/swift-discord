@@ -406,6 +406,13 @@ final class GuildTests: TestCase {
 
         XCTAssertEqual(guild.roles?.count, 1)
         XCTAssertEqual(guild.roles?[0].id, 2909267986263572999)
+        XCTAssertEqual(guild.roles?[0].name, "@everyone")
+        XCTAssertEqual(guild.roles?[0].permissions, "49794752")
+        XCTAssertEqual(guild.roles?[0].position, 0)
+        XCTAssertEqual(guild.roles?[0].color, 0)
+        XCTAssertEqual(guild.roles?[0].hoist, false)
+        XCTAssertEqual(guild.roles?[0].isManaged, false)
+        XCTAssertEqual(guild.roles?[0].isMentionable, false)
         XCTAssertEqual(guild.emojis?.count, 1)
         XCTAssertEqual(guild.emojis?[0].id, 393564762228785161)
         XCTAssertEqual(guild.features?.count, 7)
