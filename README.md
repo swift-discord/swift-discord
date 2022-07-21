@@ -4,6 +4,11 @@
 
 A Swift library for Discord API.
 
+## Available APIs
+
+- [/users/@me](Sources/DiscordV10/User+API.swift#L15-L20)
+- [/users/{user.id}](Sources/DiscordV10/User+API.swift#L28-L35)
+
 ## Using **swift-discord** in your project
 
 To use this package in a SwiftPM project, you need to set it up as a package dependency:
