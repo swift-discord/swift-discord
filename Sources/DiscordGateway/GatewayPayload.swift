@@ -10,10 +10,12 @@ import Foundation
 public struct GatewayPayload {
     public enum Data {
         public typealias Dictionary = [String: Data]
+        public typealias Array = [Data]
 
         case int(Int)
         case string(String)
         case dictionary(Dictionary)
+        case array(Array)
     }
 
     public let opcode: UInt8
@@ -55,6 +57,14 @@ extension GatewayPayload.Data {
 
         return dictionary
     }
+
+    public var arrayValue: Array? {
+        guard case let .array(array) = self else {
+            return nil
+        }
+
+        return array
+    }
 }
 
 extension GatewayPayload.Data: Decodable {
@@ -67,6 +77,8 @@ extension GatewayPayload.Data: Decodable {
             self = .string(string)
         } else if let dictionary = try? container.decode(Dictionary.self) {
             self = .dictionary(dictionary)
+        } else if let array = try? container.decode(Array.self) {
+            self = .array(array)
         } else {
             throw DecodingError.dataCorruptedError(in: container, debugDescription: "Unknown type.")
         }
@@ -84,6 +96,8 @@ extension GatewayPayload.Data: Encodable {
             try container.encode(string)
         case .dictionary(let dictionary):
             try container.encode(dictionary)
+        case .array(let array):
+            try container.encode(array)
         }
     }
 }

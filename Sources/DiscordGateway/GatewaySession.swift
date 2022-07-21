@@ -76,7 +76,7 @@ extension GatewaySession {
                         channel.pipeline.removeHandler(httpHandler, promise: nil)
                 })
 
-                return channel.pipeline.addHTTPClientHandlers(withClientUpgrade: config).flatMap {
+                return channel.pipeline.addHTTPClientHandlers(leftOverBytesStrategy: .forwardBytes, withClientUpgrade: config).flatMap {
                     channel.pipeline.addHandler(httpHandler)
                 }
             }
@@ -146,7 +146,7 @@ extension GatewaySession {
                 try heartbeat(context: context)
             }
         } catch {
-
+            debugPrint(error)
         }
     }
 

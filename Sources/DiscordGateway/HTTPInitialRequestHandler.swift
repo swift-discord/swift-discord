@@ -33,9 +33,13 @@ class HTTPInitialRequestHandler: ChannelInboundHandler, RemovableChannelHandler 
         headers.add(name: "Content-Type", value: "text/plain; charset=utf-8")
         headers.add(name: "Content-Length", value: "\(0)")
 
+        var uriComponents = URLComponents(url: url, resolvingAgainstBaseURL: true)
+        uriComponents?.scheme = nil
+        uriComponents?.host = nil
+
         let requestHead = HTTPRequestHead(version: .http1_1,
                                           method: .GET,
-                                          uri: url.path,
+                                          uri: uriComponents?.string ?? url.path,
                                           headers: headers)
 
         context.write(self.wrapOutboundOut(.head(requestHead)), promise: nil)

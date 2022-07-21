@@ -69,5 +69,8 @@ let package = Package(
         .testTarget(
             name: "DiscordV10Tests",
             dependencies: ["DiscordV10", "_DiscordTestSupport"]),
+        .testTarget(
+            name: "DiscordGatewayTests",
+            dependencies: ["Discord", "DiscordGateway", "_DiscordTestSupport"]),
     ]
 )
