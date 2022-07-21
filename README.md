@@ -10,6 +10,8 @@ A Swift library for Discord API.
 
 - [/users/@me](Sources/DiscordV10/User+API.swift#L15-L24)
 - [/users/{user.id}](Sources/DiscordV10/User+API.swift#L28-L35)
+- [/users/@me/guilds](Sources/DiscordV10/Guild+API.swift#L15-L24)
+- [/guilds/{guild.id}](Sources/DiscordV10/Guild+API.swift#L28-L35)
 
 ## Using **swift-discord** in your project
 
