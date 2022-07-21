@@ -21,7 +21,11 @@ let package = Package(
     dependencies: [
         // Dependencies declare other packages that this package depends on.
         // .package(url: /* package url */, from: "1.0.0"),
+        .package(url: "https://github.com/apple/swift-algorithms.git", .upToNextMajor(from: "1.0.0")),
         .package(url: "https://github.com/apple/swift-collections.git", .upToNextMajor(from: "1.0.0")),
+        .package(url: "https://github.com/apple/swift-nio.git", .upToNextMajor(from: "2.40.0")),
+        .package(url: "https://github.com/apple/swift-nio-ssl.git", .upToNextMajor(from: "2.20.2")),
+        .package(url: "https://github.com/apple/swift-nio-transport-services.git", .upToNextMajor(from: "1.13.0")),
         .package(url: "https://github.com/sinoru/swift-snowflake", .upToNextMinor(from: "0.0.1")),
     ],
     targets: [
@@ -33,7 +37,20 @@ let package = Package(
         .target(
             name: "Discord",
             dependencies: [
+                .product(name: "Algorithms", package: "swift-algorithms"),
                 .product(name: "Collections", package: "swift-collections"),
+                .product(name: "NIOCore", package: "swift-nio"),
+                .product(name: "NIOPosix", package: "swift-nio"),
+                .product(name: "NIOHTTP1", package: "swift-nio"),
+                .product(name: "NIOWebSocket", package: "swift-nio"),
+                .product(
+                    name: "NIOTransportServices",
+                    package: "swift-nio-transport-services",
+                    condition: .when(platforms: [.iOS, .macOS, .tvOS, .watchOS, .macCatalyst, .driverKit])),
+                .product(
+                    name: "NIOSSL",
+                    package: "swift-nio-ssl",
+                    condition: .when(platforms: [.android, .linux, .wasi, .windows])),
                 .product(name: "Snowflake", package: "swift-snowflake")
             ]),
         .target(
