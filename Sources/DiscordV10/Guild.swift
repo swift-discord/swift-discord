@@ -8,8 +8,8 @@
 import Foundation
 import Discord
 
-public struct Guild {
-    public enum VerificationLevel: Int, Sendable, Codable {
+public struct Guild: Equatable, Hashable, Identifiable, Sendable {
+    public enum VerificationLevel: Int, Equatable, Hashable, Sendable, Codable {
         case none = 0
         case low
         case medium
@@ -17,37 +17,37 @@ public struct Guild {
         case veryHigh
     }
 
-    public enum DefaultMessageNotificationLevel: Int, Sendable, Codable {
+    public enum DefaultMessageNotificationLevel: Int, Equatable, Hashable, Sendable, Codable {
         case allMessages = 0
         case onlyMentions
     }
 
-    public enum ExplicitContentFilterLevel: Int, Sendable, Codable {
+    public enum ExplicitContentFilterLevel: Int, Equatable, Hashable, Sendable, Codable {
         case disabled = 0
         case membersWithoutRoles
         case allMembers
     }
 
-    public enum MFALevel: Int, Sendable, Codable {
+    public enum MFALevel: Int, Equatable, Hashable, Sendable, Codable {
         case none = 0
         case elevated
     }
 
-    public enum NSFWLevel: Int, Sendable, Codable {
+    public enum NSFWLevel: Int, Equatable, Hashable, Sendable, Codable {
         case `default` = 0
         case explicit
         case safe
         case ageRestricted
     }
 
-    public enum PremiumTier: Int, Sendable, Codable {
+    public enum PremiumTier: Int, Equatable, Hashable, Sendable, Codable {
         case none = 0
         case tier1
         case tier2
         case tier3
     }
 
-    public struct SystemChannelFlags: OptionSet, Codable, Sendable {
+    public struct SystemChannelFlags: OptionSet, Equatable, Hashable, Sendable, Codable {
         public static let suppressJoinNotifications = Self.init(rawValue: 1 << 0)
         public static let suppressPremiumSubscriptions = Self.init(rawValue: 1 << 1)
         public static let suppressGuildReminderNotifications = Self.init(rawValue: 1 << 2)
@@ -165,22 +165,34 @@ extension Guild: Codable {
 
         case systemChannelID = "systemChannelId"
         case systemChannelFlags
+
         case rulesChannelID = "rulesChannelId"
+
         case maxPresences
         case maxMembers
+
         case vanityURLCode = "vanityUrlCode"
         case description
         case banner
+
         case premiumTier
         case premiumSubscriptionCount
+
         case preferredLocale
+
         case publicUpdatesChannelID = "publicUpdatesChannelId"
+
         case maxVideoChannelUsers
+
         case approximateMemberCount
         case approximatePresenceCount
+
         case welcomeScreen
+
         case nsfwLevel
+
         case stickers
+
         case isPremiumProgressBarEnabled = "premiumProgressBarEnabled"
 
     }

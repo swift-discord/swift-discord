@@ -49,6 +49,8 @@ extension Unknown: Comparable where T.RawValue: Comparable {
     }
 }
 
+extension Unknown: Sendable where T: Sendable, T.RawValue: Sendable { }
+
 extension Unknown: Codable where T: Codable, T.RawValue: Codable {
     public init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
