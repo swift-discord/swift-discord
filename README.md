@@ -15,6 +15,13 @@ A Swift library for Discord API.
 - [/channels/{channel.id}](Sources/DiscordAPI/Channel+API.swift#L15-L22)
 - [/guilds/{guild.id}/channels](Sources/DiscordAPI/Channel+API.swift#L26-L35)
 
+## Supported Platforms
+
+swift-discord aims to support all of the platforms where Swift is supported. Currently, it is developed and tested on macOS and Linux, and is known to support the following operating system versions:
+
+* Ubuntu 18.04+
+* macOS 10.15+, iOS 13+, tvOS 13+ or watchOS 6+
+
 ## Using **swift-discord** in your project
 
 To use this package in a SwiftPM project, you need to set it up as a package dependency:
