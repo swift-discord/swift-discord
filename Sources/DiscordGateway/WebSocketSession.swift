@@ -84,9 +84,6 @@ extension WebSocketSession {
                     data: buffer
                 )
 
-                dump(frame)
-                debugPrint(String(data: Data(buffer: frame.data), encoding: .utf8))
-
                 return context.writeAndFlush(self.wrapOutboundOut(frame))
             }
             .get()
@@ -130,11 +127,6 @@ extension WebSocketSession: ChannelInboundHandler {
 
     func channelRead(context: ChannelHandlerContext, data: NIOAny) {
         let frame = self.unwrapInboundIn(data)
-
-        dump(frame)
-        dump(frame.opcode)
-        dump(Data(buffer: frame.unmaskedData).map { String(format: "%02X", $0) })
-        debugPrint(String(data: Data(buffer: frame.unmaskedData), encoding: .utf8))
 
         switch frame.opcode {
         case .text:
