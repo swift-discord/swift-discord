@@ -18,7 +18,7 @@ public struct GatewayPayload {
         case array(Array)
     }
 
-    public let opcode: UInt8
+    public let opcode: GatewayOpcode
     public let data: Data?
     public let sequence: Int?
     public let type: String?
