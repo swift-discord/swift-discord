@@ -12,6 +12,7 @@ public struct GatewayPayload {
         public typealias Dictionary = [String: Data]
         public typealias Array = [Data]
 
+        case bool(Bool)
         case int(Int)
         case string(String)
         case dictionary(Dictionary)
@@ -34,6 +35,14 @@ extension GatewayPayload: Codable {
 }
 
 extension GatewayPayload.Data {
+    public var boolValue: Bool? {
+        guard case let .bool(bool) = self else {
+            return nil
+        }
+
+        return bool
+    }
+
     public var intValue: Int? {
         guard case let .int(int) = self else {
             return nil
@@ -71,7 +80,9 @@ extension GatewayPayload.Data: Decodable {
     public init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
 
-        if let int = try? container.decode(Int.self) {
+        if let bool = try? container.decode(Bool.self) {
+            self = .bool(bool)
+        } else if let int = try? container.decode(Int.self) {
             self = .int(int)
         } else if let string = try? container.decode(String.self) {
             self = .string(string)
@@ -90,6 +101,8 @@ extension GatewayPayload.Data: Encodable {
         var container = encoder.singleValueContainer()
 
         switch self {
+        case .bool(let bool):
+            try container.encode(bool)
         case .int(let int):
             try container.encode(int)
         case .string(let string):

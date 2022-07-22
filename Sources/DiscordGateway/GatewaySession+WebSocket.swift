@@ -106,12 +106,13 @@ extension GatewaySession {
             opcode: .identify,
             data: .dictionary([
                 "token": .string(authenticationToken),
+                "compress": .bool(false),
                 "properties": .dictionary([
                     "os": .string(os),
                     "browser": .string("swift-discord"),
                     "device": .string("swift-discord")
                 ]),
-                "intents": .int(7)
+                "intents": .int(513)
             ]),
             sequence: nil,
             type: nil

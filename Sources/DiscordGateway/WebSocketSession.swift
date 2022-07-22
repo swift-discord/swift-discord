@@ -77,7 +77,12 @@ extension WebSocketSession {
         try await context.eventLoop
             .submit {
                 let buffer = context.channel.allocator.buffer(bytes: bytes)
-                let frame = WebSocketFrame(fin: true, opcode: opcode, data: buffer)
+                let frame = WebSocketFrame(
+                    fin: true,
+                    opcode: opcode,
+                    maskKey: .random(),
+                    data: buffer
+                )
 
                 dump(frame)
                 debugPrint(String(data: Data(buffer: frame.data), encoding: .utf8))
@@ -127,8 +132,9 @@ extension WebSocketSession: ChannelInboundHandler {
         let frame = self.unwrapInboundIn(data)
 
         dump(frame)
-        dump(Data(buffer: frame.data).map { String(format: "%02X", $0) })
-        debugPrint(String(data: Data(buffer: frame.data), encoding: .utf8))
+        dump(frame.opcode)
+        dump(Data(buffer: frame.unmaskedData).map { String(format: "%02X", $0) })
+        debugPrint(String(data: Data(buffer: frame.unmaskedData), encoding: .utf8))
 
         switch frame.opcode {
         case .text:
