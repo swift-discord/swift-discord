@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import Discord
 import NIOCore
 import NIOPosix
 import NIOHTTP1
@@ -19,18 +18,18 @@ import NIOFoundationCompat
 #endif
 
 public actor GatewaySession {
-    public let session: Session
+    public let authenticationToken: String?
 
     let eventLoopGroup: EventLoopGroup
-    weak var channel: Channel?
+    weak var channel: NIOCore.Channel?
 
     var lastHeartbeatACKDate: Date = .distantFuture
     var heartbeatInterval: TimeInterval = .leastNormalMagnitude
 
     var sequence: Int?
 
-    public init(session: Session) {
-        self.session = session
+    public init(authenticationToken: String) {
+        self.authenticationToken = authenticationToken
 
         #if canImport(NIOTransportServices)
         self.eventLoopGroup = NIOTSEventLoopGroup(loopCount: 1, defaultQoS: .default)
@@ -66,7 +65,7 @@ extension GatewaySession {
                 let httpHandler = HTTPInitialRequestHandler(url: Self.gatewayURL)
 
                 let websocketUpgrader = NIOWebSocketClientUpgrader(requestKey: "OfS0wDaT5NoxF2gqm7Zj2YtetzM=",
-                                                                   upgradePipelineHandler: { (channel: Channel, _: HTTPResponseHead) in
+                                                                   upgradePipelineHandler: { (channel: NIOCore.Channel, _: HTTPResponseHead) in
                     channel.pipeline.addHandler(self)
                 })
 
@@ -142,7 +141,7 @@ extension GatewaySession {
 
             sequence = payload.sequence ?? sequence
 
-            if Date() < lastHeartbeatACKDate.addingTimeInterval(heartbeatInterval) {
+            if Date() >= lastHeartbeatACKDate.addingTimeInterval(heartbeatInterval) {
                 try heartbeat(context: context)
             }
         } catch {

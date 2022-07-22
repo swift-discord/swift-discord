@@ -11,10 +11,11 @@ import _DiscordTestSupport
 
 final class DiscordGatewayTests: TestCase {
     func testMain() async throws {
-        let session = Self.session
-        await session.updateOAuth2Credential(Self.oAuth2Credential)
+        guard let authenticationToken = Self.oAuth2Credential?.accessToken else {
+            throw XCTSkip("oAuth2Credential not available.")
+        }
 
-        let gatewaySession = GatewaySession(session: session)
+        let gatewaySession = GatewaySession(authenticationToken: authenticationToken)
         try await gatewaySession.connect()
 
         withExtendedLifetime(gatewaySession) {

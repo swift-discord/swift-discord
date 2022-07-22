@@ -16,7 +16,13 @@ let package = Package(
         // Products define the executables and libraries a package produces, and make them visible to other packages.
         .library(
             name: "Discord",
-            targets: ["Discord", "DiscordV10", "DiscordGateway"]),
+            targets: ["Discord"]),
+        .library(
+            name: "DiscordAPI",
+            targets: ["DiscordAPI"]),
+        .library(
+            name: "DiscordGateway",
+            targets: ["DiscordGateway"]),
     ],
     dependencies: [
         // Dependencies declare other packages that this package depends on.
@@ -33,18 +39,26 @@ let package = Package(
         // Targets can depend on other targets in this package, and on products in packages this package depends on.
         .target(
             name: "Discord",
+            dependencies: ["DiscordAPI", "DiscordGateway"]),
+        .target(
+            name: "DiscordCore",
             dependencies: [
-                .product(name: "Collections", package: "swift-collections"),
                 .product(name: "Snowflake", package: "swift-snowflake")
             ]),
         .target(
-            name: "DiscordV10",
-            dependencies: ["Discord"]),
+            name: "DiscordAPI",
+            dependencies: ["DiscordAPIModel"]),
+        .target(
+            name: "DiscordAPIModel",
+            dependencies: [
+                .product(name: "OrderedCollections", package: "swift-collections"),
+                "DiscordCore"
+            ]),
         .target(
             name: "DiscordGateway",
             dependencies: [
                 .product(name: "Algorithms", package: "swift-algorithms"),
-                "Discord",
+                "DiscordCore",
                 .product(name: "NIOCore", package: "swift-nio"),
                 .product(name: "NIOPosix", package: "swift-nio"),
                 .product(name: "NIOFoundationCompat", package: "swift-nio"),
@@ -58,19 +72,18 @@ let package = Package(
                     name: "NIOSSL",
                     package: "swift-nio-ssl",
                     condition: .when(platforms: [.android, .linux, .wasi, .windows])),
-                .product(name: "Snowflake", package: "swift-snowflake")
             ]),
         .target(
             name: "_DiscordTestSupport",
             dependencies: ["Discord"]),
         .testTarget(
-            name: "DiscordTests",
-            dependencies: ["Discord", "_DiscordTestSupport"]),
+            name: "DiscordAPITests",
+            dependencies: ["DiscordAPI", "_DiscordTestSupport"]),
         .testTarget(
-            name: "DiscordV10Tests",
-            dependencies: ["DiscordV10", "_DiscordTestSupport"]),
+            name: "DiscordAPIModelTests",
+            dependencies: ["DiscordAPIModel", "_DiscordTestSupport"]),
         .testTarget(
             name: "DiscordGatewayTests",
-            dependencies: ["Discord", "DiscordGateway", "_DiscordTestSupport"]),
+            dependencies: ["DiscordGateway", "_DiscordTestSupport"]),
     ]
 )
