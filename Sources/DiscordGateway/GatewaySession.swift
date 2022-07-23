@@ -6,21 +6,11 @@
 //
 
 import Foundation
-import NIOCore
-import NIOPosix
-import NIOHTTP1
-import NIOWebSocket
-#if canImport(NIOTransportServices)
-import NIOTransportServices
-import Network
-#else
-import NIOFoundationCompat
-#endif
+import WebSocket
 
 public actor GatewaySession {
     public let authenticationToken: String?
 
-    let eventLoopGroup: EventLoopGroup
     var webSocketSession: WebSocketSession?
 
     var lastHeartbeatACKDate: Date = .distantFuture
@@ -30,17 +20,11 @@ public actor GatewaySession {
 
     public init(authenticationToken: String) {
         self.authenticationToken = authenticationToken
-
-        #if canImport(NIOTransportServices)
-        self.eventLoopGroup = NIOTSEventLoopGroup(loopCount: 1, defaultQoS: .default)
-        #else
-        self.eventLoopGroup = MultiThreadedEventLoopGroup(numberOfThreads: 1)
-        #endif
     }
 
-    deinit {
-        eventLoopGroup.shutdownGracefully { _ in }
-    }
+//    deinit {
+//        eventLoopGroup.shutdownGracefully { _ in }
+//    }
 }
 
 extension GatewaySession {
@@ -49,7 +33,7 @@ extension GatewaySession {
     }
 
     public func connect() async throws {
-        self.webSocketSession = WebSocketSession(gatewaySession: self, gatewayURL: Self.gatewayURL)
+        self.webSocketSession = WebSocketSession(gatewayURL: Self.gatewayURL, configuration: .init(), delegate: self)
         try await self.webSocketSession!.connect()
     }
 

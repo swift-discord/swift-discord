@@ -6,16 +6,7 @@
 //
 
 import Foundation
-import NIOCore
-import NIOPosix
-import NIOHTTP1
-import NIOWebSocket
-#if canImport(NIOTransportServices)
-import NIOTransportServices
-import Network
-#else
-import NIOFoundationCompat
-#endif
+import WebSocket
 
 extension GatewaySession {
     var os: String {
@@ -39,11 +30,24 @@ extension GatewaySession {
     }
 }
 
-extension GatewaySession {
-    func didReceiveMessage(frame: WebSocketFrame, context: ChannelHandlerContext) async {
+extension GatewaySession: WebSocketSessionDelegate {
+    public nonisolated func didReceiveMessage(_ message: WebSocketSession.Message, context: Context) {
+        Task {
+            await _didReceiveMessage(message, context: context)
+        }
+    }
+
+    func _didReceiveMessage(_ message: WebSocketSession.Message, context: Context) async {
         do {
             let jsonDecoder = JSONDecoder()
-            let payload = try jsonDecoder.decode(GatewayPayload.self, from: frame.data)
+            let payload: GatewayPayload = try {
+                switch message {
+                case .string(let string):
+                    return try jsonDecoder.decode(GatewayPayload.self, from: Data(string.utf8))
+                case .data(let data):
+                    return try jsonDecoder.decode(GatewayPayload.self, from: data) // TODO: Handle compression.
+                }
+            }()
 
             dump(payload)
 
@@ -60,7 +64,7 @@ extension GatewaySession {
             case .heartbeatACK:
                 self.lastHeartbeatACKDate = Date()
             default:
-                dump(frame)
+                dump(message)
                 break
             }
 
@@ -73,7 +77,9 @@ extension GatewaySession {
             debugPrint(error)
         }
     }
+}
 
+extension GatewaySession {
     func send(payload: GatewayPayload) async throws {
         guard let webSocketSession = webSocketSession else {
             return
@@ -83,7 +89,7 @@ extension GatewaySession {
 
         let data = try jsonEncoder.encode(payload)
 
-        try await webSocketSession.send(opcode: .text, bytes: data)
+        try await webSocketSession.send(.string(String(decoding: data, as: UTF8.self)))
     }
 
     func heartbeat() async throws {

@@ -57,8 +57,16 @@ let package = Package(
         .target(
             name: "DiscordGateway",
             dependencies: [
-                .product(name: "Algorithms", package: "swift-algorithms"),
                 "DiscordCore",
+                "WebSocket",
+            ]),
+        .target(
+            name: "_DiscordTestSupport",
+            dependencies: ["Discord"]),
+        .target(
+            name: "WebSocket",
+            dependencies: [
+                .product(name: "Algorithms", package: "swift-algorithms"),
                 .product(name: "NIOCore", package: "swift-nio"),
                 .product(name: "NIOPosix", package: "swift-nio"),
                 .product(name: "NIOFoundationCompat", package: "swift-nio"),
@@ -67,15 +75,12 @@ let package = Package(
                 .product(
                     name: "NIOTransportServices",
                     package: "swift-nio-transport-services",
-                    condition: .when(platforms: [.iOS, .macOS, .tvOS, .watchOS, .macCatalyst, .driverKit])),
+                    condition: .when(platforms: [.iOS, .macOS, .tvOS, .watchOS, .macCatalyst])),
                 .product(
                     name: "NIOSSL",
                     package: "swift-nio-ssl",
-                    condition: .when(platforms: [.android, .linux, .wasi, .windows])),
+                    condition: .when(platforms: [.android, .linux, .windows])),
             ]),
-        .target(
-            name: "_DiscordTestSupport",
-            dependencies: ["Discord"]),
         .testTarget(
             name: "DiscordAPITests",
             dependencies: ["DiscordAPI", "_DiscordTestSupport"]),
