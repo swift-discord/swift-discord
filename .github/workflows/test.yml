@@ -66,6 +66,6 @@ jobs:
       - name: Resolve Package Dependencies
         run: xcodebuild -resolvePackageDependencies
       - name: Analyze
-        run: xcodebuild -scheme Discord -destination '${{ matrix.xcode-destination }}' analyze
+        run: xcodebuild -scheme swift-discord-Package -destination '${{ matrix.xcode-destination }}' analyze
       - name: Test
-        run: xcodebuild -scheme Discord -destination '${{ matrix.xcode-destination }}' test
+        run: xcodebuild -scheme swift-discord-Package -destination '${{ matrix.xcode-destination }}' test
