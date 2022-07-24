@@ -6,9 +6,9 @@
 //
 
 public struct DiscordAPIVersion : Encodable {
-    let versionString: String
+    public let versionString: String
 
-    fileprivate init(versionString: String) {
+    private init(versionString: String) {
         self.versionString = versionString
     }
 

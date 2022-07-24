@@ -12,7 +12,7 @@ import FoundationNetworking
 
 extension User {
     public static func me(session: Session) async throws -> User {
-        var urlRequest = URLRequest(url: URL(discordAPIPath: "v10/users/@me")!)
+        var urlRequest = URLRequest(url: URL(discordAPIPath: "users/@me", apiVersion: session.configuration.apiVersion)!)
         urlRequest.httpMethod = "GET"
 
         let (data, _) = try await session.data(for: urlRequest, includesOAuth2Credential: true)
@@ -25,7 +25,7 @@ extension User {
 
 extension User {
     public init(userID: Snowflake, session: Session) async throws {
-        var urlRequest = URLRequest(url: URL(discordAPIPath: "v10/users/\(userID.rawValue)")!)
+        var urlRequest = URLRequest(url: URL(discordAPIPath: "users/\(userID.rawValue)", apiVersion: session.configuration.apiVersion)!)
         urlRequest.httpMethod = "GET"
 
         let (data, _) = try await session.data(for: urlRequest, includesOAuth2Credential: true)
