@@ -21,13 +21,13 @@ public struct DiscordAPIVersion : Encodable {
     @available(*, unavailable, message: "DiscordAPI v6 is the oldest deprecated version")
     public static let v5: DiscordAPIVersion = .init(versionString: "5")
 
-    @available(*, deprecated, message: "DiscordAPI v9 is the oldest availabled version")
+    @available(*, deprecated, message: "DiscordAPI v9 is the oldest available version")
     public static let v6: DiscordAPIVersion = .init(versionString: "6")
 
-    @available(*, deprecated, message: "DiscordAPI v9 is the oldest availabled version")
+    @available(*, deprecated, message: "DiscordAPI v9 is the oldest available version")
     public static let v7: DiscordAPIVersion = .init(versionString: "7")
 
-    @available(*, deprecated, message: "DiscordAPI v9 is the oldest availabled version")
+    @available(*, deprecated, message: "DiscordAPI v9 is the oldest available version")
     public static let v8: DiscordAPIVersion = .init(versionString: "8")
 
     public static let v9: DiscordAPIVersion = .init(versionString: "9")
