@@ -28,7 +28,7 @@ final class UserAPITests: TestCase {
         let user = try await User.me(session: session)
 
         XCTAssertEqual(user.id, 999234842573164686)
-        XCTAssertEqual(user.username, "Swifty Test")
+        XCTAssertEqual(user.username, "Swifty Test Bot")
         XCTAssertEqual(user.discriminator, "7580")
         XCTAssertEqual(user.avatar, nil)
         XCTAssertEqual(user.bot, true)
