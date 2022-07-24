@@ -1,5 +1,5 @@
 //
-//  GuildAPITests.swift
+//  ChannelAPITests.swift
 //  
 //
 //  Created by Jaehong Kang on 2022/07/21.
@@ -7,10 +7,10 @@
 
 import _DiscordTestSupport
 @testable import DiscordCore
-@testable import DiscordAPIModel
-@testable import DiscordAPI
+@testable import DiscordRESTModel
+@testable import DiscordREST
 
-final class GuildAPITests: TestCase {
+final class ChannelAPITests: TestCase {
     var session: Session!
 
     override func setUp() async throws {
@@ -25,15 +25,15 @@ final class GuildAPITests: TestCase {
         // Put teardown code here. This method is called after the invocation of each test method in the class.
     }
 
-    func testMyGuilds() async throws {
-        let guilds = try await Guild.myGuilds(session: session)
+    func testInitByChannelID() async throws {
+        let channel = try await Channel(channelID: 999525888003678308, session: session)
 
-        XCTAssertTrue(guilds.contains(where: { $0.id == 999525887206756372 }))
+        XCTAssertEqual(channel.id, 999525888003678308)
     }
 
-    func testInitByUserID() async throws {
-        let guild = try await Guild(guildID: 999525887206756372, session: session)
+    func testGetChannelsFromGuild() async throws {
+        let channels = try await Channel.channels(forGuildID: 999525887206756372, session: session)
 
-        XCTAssertEqual(guild.id, 999525887206756372)
+        XCTAssertEqual(channels.count, 11)
     }
 }

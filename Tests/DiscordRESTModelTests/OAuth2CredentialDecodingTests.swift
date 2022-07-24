@@ -7,7 +7,7 @@
 
 import _DiscordTestSupport
 @testable import DiscordCore
-@testable import DiscordAPIModel
+@testable import DiscordRESTModel
 
 final class OAuth2CredentialDecodingTests: TestCase {
     func testDecodeAccessTokenResponse() throws {

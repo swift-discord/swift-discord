@@ -7,7 +7,7 @@
 
 import _DiscordTestSupport
 @testable import DiscordCore
-@testable import DiscordAPIModel
+@testable import DiscordRESTModel
 
 final class Guild_WelcomeScreenTests: XCTestCase {
     func testDecodingWelcomeScreenExample() throws {

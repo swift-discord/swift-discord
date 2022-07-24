@@ -18,8 +18,8 @@ let package = Package(
             name: "Discord",
             targets: ["Discord"]),
         .library(
-            name: "DiscordAPI",
-            targets: ["DiscordAPI"]),
+            name: "DiscordREST",
+            targets: ["DiscordREST"]),
         .library(
             name: "DiscordGateway",
             targets: ["DiscordGateway"]),
@@ -39,17 +39,17 @@ let package = Package(
         // Targets can depend on other targets in this package, and on products in packages this package depends on.
         .target(
             name: "Discord",
-            dependencies: ["DiscordAPI", "DiscordGateway"]),
+            dependencies: ["DiscordREST", "DiscordGateway"]),
         .target(
             name: "DiscordCore",
             dependencies: [
                 .product(name: "Snowflake", package: "swift-snowflake")
             ]),
         .target(
-            name: "DiscordAPI",
-            dependencies: ["DiscordAPIModel"]),
+            name: "DiscordREST",
+            dependencies: ["DiscordRESTModel"]),
         .target(
-            name: "DiscordAPIModel",
+            name: "DiscordRESTModel",
             dependencies: [
                 .product(name: "OrderedCollections", package: "swift-collections"),
                 "DiscordCore"
@@ -82,11 +82,11 @@ let package = Package(
                     condition: .when(platforms: [.android, .linux, .windows])),
             ]),
         .testTarget(
-            name: "DiscordAPITests",
-            dependencies: ["DiscordAPI", "_DiscordTestSupport"]),
+            name: "DiscordRESTTests",
+            dependencies: ["DiscordREST", "_DiscordTestSupport"]),
         .testTarget(
-            name: "DiscordAPIModelTests",
-            dependencies: ["DiscordAPIModel", "_DiscordTestSupport"]),
+            name: "DiscordRESTModelTests",
+            dependencies: ["DiscordRESTModel", "_DiscordTestSupport"]),
         .testTarget(
             name: "DiscordGatewayTests",
             dependencies: ["DiscordGateway", "_DiscordTestSupport"]),

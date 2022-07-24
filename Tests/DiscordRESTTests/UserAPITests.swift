@@ -7,8 +7,8 @@
 
 import _DiscordTestSupport
 @testable import DiscordCore
-@testable import DiscordAPIModel
-@testable import DiscordAPI
+@testable import DiscordRESTModel
+@testable import DiscordREST
 
 final class UserAPITests: TestCase {
     var session: Session!

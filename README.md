@@ -8,12 +8,12 @@ A Swift library for Discord API.
 
 ## Available APIs
 
-- [/users/@me](Sources/DiscordAPI/User+API.swift#L15-L24)
-- [/users/{user.id}](Sources/DiscordAPI/User+API.swift#L28-L35)
-- [/users/@me/guilds](Sources/DiscordAPI/Guild+API.swift#L15-L24)
-- [/guilds/{guild.id}](Sources/DiscordAPI/Guild+API.swift#L28-L35)
-- [/channels/{channel.id}](Sources/DiscordAPI/Channel+API.swift#L15-L22)
-- [/guilds/{guild.id}/channels](Sources/DiscordAPI/Channel+API.swift#L26-L35)
+- [/users/@me](Sources/DiscordREST/User+API.swift#L15-L24)
+- [/users/{user.id}](Sources/DiscordREST/User+API.swift#L28-L35)
+- [/users/@me/guilds](Sources/DiscordREST/Guild+API.swift#L15-L24)
+- [/guilds/{guild.id}](Sources/DiscordREST/Guild+API.swift#L28-L35)
+- [/channels/{channel.id}](Sources/DiscordREST/Channel+API.swift#L15-L22)
+- [/guilds/{guild.id}/channels](Sources/DiscordREST/Channel+API.swift#L26-L35)
 
 ## Supported Platforms
 
