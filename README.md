@@ -42,7 +42,7 @@ let package = Package(
     .target(
       name: "MyTarget",
       dependencies: [
-        .product(name: "DiscordV10", package: "swift-discord")
+        .product(name: "Discord", package: "swift-discord")
       ]
     )
   ]
