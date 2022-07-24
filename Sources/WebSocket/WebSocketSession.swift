@@ -138,13 +138,22 @@ extension WebSocketSession {
         case .text:
             var data = frame.unmaskedData
             guard let string = data.readString(length: data.readableBytes) else {
-                delegate?.didReceiveMessage(.data(Data(buffer: frame.unmaskedData)), context: .init(session: self, channelHandlerContext: context, frame: frame))
+                delegate?.didReceiveMessage(
+                    .data(Data(buffer: frame.unmaskedData)),
+                    context: .init(session: self, channelHandlerContext: context, frame: frame)
+                )
                 break
             }
 
-            delegate?.didReceiveMessage(.string(string), context: .init(session: self, channelHandlerContext: context, frame: frame))
+            delegate?.didReceiveMessage(
+                .string(string),
+                context: .init(session: self, channelHandlerContext: context, frame: frame)
+            )
         case .binary:
-            delegate?.didReceiveMessage(.data(Data(buffer: frame.unmaskedData)), context: .init(session: self, channelHandlerContext: context, frame: frame))
+            delegate?.didReceiveMessage(
+                .data(Data(buffer: frame.unmaskedData)),
+                context: .init(session: self, channelHandlerContext: context, frame: frame)
+            )
         case .connectionClose:
             Task {
                 try await self.close(context: context)
