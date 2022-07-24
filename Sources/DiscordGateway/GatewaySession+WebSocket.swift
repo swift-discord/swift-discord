@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import DiscordCore
 import WebSocket
 
 extension GatewaySession {
@@ -40,12 +41,12 @@ extension GatewaySession: WebSocketSessionDelegate {
     func _didReceiveMessage(_ message: WebSocketSession.Message, context: Context) async {
         do {
             let jsonDecoder = JSONDecoder()
-            let payload: GatewayPayload = try {
+            let payload: GatewayDynamicPayload = try {
                 switch message {
                 case .string(let string):
-                    return try jsonDecoder.decode(GatewayPayload.self, from: Data(string.utf8))
+                    return try jsonDecoder.decode(GatewayDynamicPayload.self, from: Data(string.utf8))
                 case .data(let data):
-                    return try jsonDecoder.decode(GatewayPayload.self, from: data) // TODO: Handle compression.
+                    return try jsonDecoder.decode(GatewayDynamicPayload.self, from: data) // TODO: Handle compression.
                 }
             }()
 
@@ -53,7 +54,7 @@ extension GatewaySession: WebSocketSessionDelegate {
 
             switch payload.opcode {
             case .hello:
-                let heartbeatInterval = payload.data?.dictionaryValue?["heartbeat_interval"]?.intValue.flatMap {
+                let heartbeatInterval = payload.data?.object?["heartbeat_interval"]??.number?.int.flatMap {
                     TimeInterval($0)
                 }
 
@@ -80,7 +81,7 @@ extension GatewaySession: WebSocketSessionDelegate {
 }
 
 extension GatewaySession {
-    func send(payload: GatewayPayload) async throws {
+    func send<D>(payload: GatewayPayload<D>) async throws where D: Encodable {
         guard let webSocketSession = webSocketSession else {
             return
         }
@@ -93,9 +94,9 @@ extension GatewaySession {
     }
 
     func heartbeat() async throws {
-        let payload = GatewayPayload(
+        let payload = GatewayDynamicPayload(
             opcode: .heartbeat,
-            data: sequence.flatMap { .int($0) },
+            data: sequence.flatMap { .number(.int(Int64($0))) },
             sequence: nil,
             type: nil
         )
@@ -108,17 +109,17 @@ extension GatewaySession {
             return
         }
 
-        let payload = GatewayPayload(
+        let payload = GatewayDynamicPayload(
             opcode: .identify,
-            data: .dictionary([
+            data: .object([
                 "token": .string(authenticationToken),
                 "compress": .bool(false),
-                "properties": .dictionary([
+                "properties": .object([
                     "os": .string(os),
                     "browser": .string("swift-discord"),
                     "device": .string("swift-discord")
                 ]),
-                "intents": .int(513)
+                "intents": .number(.int(513))
             ]),
             sequence: nil,
             type: nil
