@@ -8,39 +8,51 @@
 import Foundation
 import Algorithms
 import NIOCore
-import NIOPosix
 import NIOHTTP1
-import NIOWebSocket
 
-class HTTPInitialRequestHandler: ChannelInboundHandler, RemovableChannelHandler {
-    public typealias InboundIn = HTTPClientResponsePart
-    public typealias OutboundOut = HTTPClientRequestPart
+class HTTPInitialRequestHandler {
+    let host: String?
+    let uri: String
 
-    public let url: URL
-
-    public init(url: URL) {
-        self.url = url
+    init(host: String?, uri: String = "/") {
+        self.host = host
+        self.uri = uri
     }
 
-    public func channelActive(context: ChannelHandlerContext) {
-        print("Client connected to \(context.remoteAddress!)")
-
-        // We are connected. It's time to send the message to the server to initialize the upgrade dance.
-        var headers = HTTPHeaders()
-        if let host = url.host {
-            headers.add(name: "Host", value: "\([host, url.port.flatMap { String($0) } ].compacted().joined(separator: ":"))")
+    init(url: URL) {
+        self.host = url.host.flatMap {
+            [$0, url.port.flatMap { String($0) } ].compacted().joined(separator: ":")
         }
-        headers.add(name: "Content-Type", value: "text/plain; charset=utf-8")
-        headers.add(name: "Content-Length", value: "\(0)")
 
         var uriComponents = URLComponents(url: url, resolvingAgainstBaseURL: true)
         uriComponents?.scheme = nil
         uriComponents?.host = nil
 
-        let requestHead = HTTPRequestHead(version: .http1_1,
-                                          method: .GET,
-                                          uri: uriComponents?.string ?? url.path,
-                                          headers: headers)
+        self.uri = uriComponents?.string ?? url.path
+    }
+}
+
+extension HTTPInitialRequestHandler: ChannelInboundHandler, RemovableChannelHandler {
+    public typealias InboundIn = HTTPClientResponsePart
+    public typealias OutboundOut = HTTPClientRequestPart
+
+    func channelActive(context: ChannelHandlerContext) {
+        print("Client connected to \(context.remoteAddress!)")
+
+        // We are connected. It's time to send the message to the server to initialize the upgrade dance.
+        var headers = HTTPHeaders()
+        if let host = host {
+            headers.add(name: "Host", value: host)
+        }
+        headers.add(name: "Content-Type", value: "text/plain; charset=utf-8")
+        headers.add(name: "Content-Length", value: "\(0)")
+
+        let requestHead = HTTPRequestHead(
+            version: .http1_1,
+            method: .GET,
+            uri: uri,
+            headers: headers
+        )
 
         context.write(self.wrapOutboundOut(.head(requestHead)), promise: nil)
 
@@ -50,8 +62,7 @@ class HTTPInitialRequestHandler: ChannelInboundHandler, RemovableChannelHandler 
         context.writeAndFlush(self.wrapOutboundOut(.end(nil)), promise: nil)
     }
 
-    public func channelRead(context: ChannelHandlerContext, data: NIOAny) {
-
+    func channelRead(context: ChannelHandlerContext, data: NIOAny) {
         let clientResponse = self.unwrapInboundIn(data)
 
         print("Upgrade failed")
@@ -68,11 +79,11 @@ class HTTPInitialRequestHandler: ChannelInboundHandler, RemovableChannelHandler 
         }
     }
 
-    public func handlerRemoved(context: ChannelHandlerContext) {
+    func handlerRemoved(context: ChannelHandlerContext) {
         print("HTTP handler removed.")
     }
 
-    public func errorCaught(context: ChannelHandlerContext, error: Error) {
+    func errorCaught(context: ChannelHandlerContext, error: Error) {
         print("error: ", error)
 
         // As we are not really interested getting notified on success or failure
