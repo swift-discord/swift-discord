@@ -173,6 +173,10 @@ final class OAuth2CredentialDecodingTests: TestCase {
 
         let oAuth2Credential2 = try jsonDecoder.decode(OAuth2Credential.self, from: encodedOAuth2Credential)
 
-        XCTAssertEqual(oAuth2Credential, oAuth2Credential2)
+        XCTAssertEqual(oAuth2Credential.tokenType, oAuth2Credential2.tokenType)
+        XCTAssertEqual(oAuth2Credential.accessToken, oAuth2Credential2.accessToken)
+        XCTAssertEqual(oAuth2Credential.validityPeriod.duration, oAuth2Credential2.validityPeriod.duration)
+        XCTAssertEqual(oAuth2Credential.refreshToken, oAuth2Credential2.refreshToken)
+        XCTAssertEqual(oAuth2Credential.scopes, oAuth2Credential2.scopes)
     }
 }
