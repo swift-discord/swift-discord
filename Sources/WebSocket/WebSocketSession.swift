@@ -94,41 +94,47 @@ extension WebSocketSession {
 
         return try await channel.writeAndFlush(frame)
     }
+
+    public func disconnect() async throws {
+        try await close()
+    }
 }
 
 extension WebSocketSession {
-    func send<S>(opcode: WebSocketOpcode, bytes: S) async throws where S: Sequence, S.Element == UInt8 {
-        guard let channel = channel else {
-            return
-        }
+    func close(frame: WebSocketFrame, context: ChannelHandlerContext) async throws {
+        let data = Data(buffer: frame.unmaskedData)
 
-        let buffer = channel.allocator.buffer(bytes: bytes)
-        let frame = WebSocketFrame(
-            fin: true,
-            opcode: opcode,
-            maskKey: .random(),
-            data: buffer
+        let closeCode: UInt16 = data.prefix(2)
+            .withUnsafeBytes { (unsafeRawBufferPointer: UnsafeRawBufferPointer) in
+                unsafeRawBufferPointer.load(as: UInt16.self)
+            }
+
+        let reason: Data = data.dropFirst(2)
+
+        delegate?.didReceiveClose(
+            code: .init(rawValue: closeCode),
+            reason: reason,
+            context: .init(session: self, channelHandlerContext: context, frame: frame)
         )
 
-        return try await channel.writeAndFlush(frame)
+        try await close(code: nil)
     }
 
-    func close(context: ChannelHandlerContext? = nil, errorCode: WebSocketErrorCode? = nil) async throws {
-        guard let channel = context?.channel ?? self.channel else {
+    func close(code: CloseCode? = .normalClosure, context: ChannelHandlerContext? = nil) async throws {
+        guard let channel = context?.channel ?? channel else {
             return
         }
 
-        if let errorCode = errorCode {
-            // We have hit an error, we want to close. We do that by sending a close frame and then
-            // shutting down the write side of the connection. The server will respond with a close of its own.
+        if let closeCode = code {
             var data = channel.allocator.buffer(capacity: 2)
-            data.write(webSocketErrorCode: errorCode)
+            data.write(webSocketErrorCode: closeCode.webSocketErrorCode)
             let frame = WebSocketFrame(fin: true, opcode: .connectionClose, data: data)
-            try await channel.write(frame).get()
-            try await channel.close(mode: .output)
-        } else {
-            try await channel.close()
+            try? await channel.writeAndFlush(frame).get()
         }
+
+        try await channel.close()
+
+        delegate?.didClose(context: .init(session: self, channelHandlerContext: nil, frame: nil))
     }
 }
 
@@ -156,7 +162,7 @@ extension WebSocketSession {
             )
         case .connectionClose:
             Task {
-                try await self.close(context: context)
+                try await self.close(frame: frame, context: context)
             }
         default:
             break
