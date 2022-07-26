@@ -7,12 +7,12 @@
 
 import Foundation
 import NIOCore
-import NIOPosix
 import NIOHTTP1
 import NIOWebSocket
+@_implementationOnly import NIOPosix
 #if canImport(NIOTransportServices)
-import NIOTransportServices
-import Network
+@_implementationOnly import NIOTransportServices
+@_implementationOnly import Network
 #else
 import NIOFoundationCompat
 #endif

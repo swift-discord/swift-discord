@@ -7,9 +7,9 @@
 
 import NIOCore
 #if canImport(NIOTransportServices)
-import NIOTransportServices
+@_implementationOnly import NIOTransportServices
 #else
-import NIOPosix
+@_implementationOnly import NIOPosix
 #endif
 
 extension WebSocketSession {
