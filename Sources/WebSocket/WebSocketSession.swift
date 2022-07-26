@@ -86,7 +86,7 @@ extension WebSocketSession {
                 )
 
                 let sslPromise: EventLoopFuture<Void>
-                #if canImport(NIOSSL)
+                #if canImport(NIOSSL) && !canImport(NIOTransportServices)
                 if let sslClientHandler = sslClientHandler {
                     sslPromise = channel.pipeline.addHandler(sslClientHandler)
                 } else {
