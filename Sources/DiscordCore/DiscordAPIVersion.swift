@@ -5,7 +5,7 @@
 //  Created by Jaehong Kang on 2022/07/24.
 //
 
-public struct DiscordAPIVersion : Encodable {
+public struct DiscordAPIVersion: Equatable, Hashable, Sendable {
     public let versionString: String
 
     private init(versionString: String) {
