@@ -16,18 +16,21 @@ import NIOWebSocket
 #else
 import NIOFoundationCompat
 #endif
+#if canImport(NIOSSL)
+import NIOSSL
+#endif
 
 public class WebSocketSession {
     public typealias Delegate = WebSocketSessionDelegate
 
-    public let gatewayURL: URL
+    public let url: URL
     public let configuration: Configuration
     public private(set) weak var delegate: Delegate?
 
     private var channel: Channel?
 
-    public init(gatewayURL: URL, configuration: Configuration, delegate: WebSocketSessionDelegate) {
-        self.gatewayURL = gatewayURL
+    public init(url: URL, configuration: Configuration, delegate: WebSocketSessionDelegate) {
+        self.url = url
         self.configuration = configuration
         self.delegate = delegate
     }
@@ -40,35 +43,65 @@ public class WebSocketSession {
 extension WebSocketSession {
     public func connect() async throws {
         #if canImport(NIOTransportServices)
-        let bootstrap = NIOTSConnectionBootstrap(group: configuration.threadPool.eventLoopGroup)
-            .tlsOptions(NWProtocolTLS.Options())
+        var bootstrap = NIOTSConnectionBootstrap(group: configuration.threadPool.eventLoopGroup)
         #else
         let bootstrap = ClientBootstrap(group: configuration.threadPool.eventLoopGroup)
+        #endif
+
+        #if canImport(NIOTransportServices)
+        if url.scheme == "wss" {
+            bootstrap = bootstrap.tlsOptions(NWProtocolTLS.Options())
+        }
         #endif
 
         self.channel = try await bootstrap
             // Enable SO_REUSEADDR.
             .channelOption(ChannelOptions.socketOption(.so_reuseaddr), value: 1)
             .channelInitializer { channel in
+                let httpHandler = HTTPInitialRequestHandler(url: self.url)
 
-                let httpHandler = HTTPInitialRequestHandler(url: self.gatewayURL)
-
-                let websocketUpgrader = NIOWebSocketClientUpgrader(requestKey: "OfS0wDaT5NoxF2gqm7Zj2YtetzM=",
-                                                                   upgradePipelineHandler: { (channel: NIOCore.Channel, _: HTTPResponseHead) in
-                    channel.pipeline.addHandler(WebSocketHandler(webSocketSession: self))
-                })
+                let websocketUpgrader = NIOWebSocketClientUpgrader(
+                    upgradePipelineHandler: { (channel: NIOCore.Channel, _: HTTPResponseHead) in
+                        channel.pipeline.addHandler(WebSocketHandler(webSocketSession: self))
+                    }
+                )
 
                 let config: NIOHTTPClientUpgradeConfiguration = (
                     upgraders: [ websocketUpgrader ],
                     completionHandler: { _ in
                         channel.pipeline.removeHandler(httpHandler, promise: nil)
-                })
+                    }
+                )
 
-                return channel.pipeline.addHTTPClientHandlers(leftOverBytesStrategy: .forwardBytes, withClientUpgrade: config).flatMap {
-                    channel.pipeline.addHandler(httpHandler)
+                let sslPromise: EventLoopFuture<Void>
+                #if canImport(NIOSSL)
+                if url.scheme == "wss" {
+                    let sslContext = try NIOSSLContext(configuration: .clientDefault)
+                    let sslClientHandler: NIOSSLClientHandler = try {
+                        do {
+                            return try NIOSSLClientHandler(context: context, serverHostname: url.host)
+                        } catch NIOSSLExtraError.cannotUseIPAddressInSNI {
+                            return try NIOSSLClientHandler(context: context, serverHostname: nil)
+                        }
+                    }()
+
+                    sslPromise = channel.pipeline.addHandler(sslClientHandler)
+                } else {
+                    sslPromise = channel.eventLoop.makeSucceededVoidFuture()
                 }
+                #else
+                sslPromise = channel.eventLoop.makeSucceededVoidFuture()
+                #endif
+
+                return sslPromise
+                    .flatMap {
+                        channel.pipeline.addHTTPClientHandlers(leftOverBytesStrategy: .forwardBytes, withClientUpgrade: config)
+                    }
+                    .flatMap {
+                        channel.pipeline.addHandler(httpHandler)
+                    }
             }
-            .connect(host: self.gatewayURL.host!, port: self.gatewayURL.port ?? 443)
+            .connect(host: self.url.host!, port: self.url.port ?? 443)
             .get()
     }
 
