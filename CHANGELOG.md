@@ -6,6 +6,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.0.3]
+### Added
+- Add `DiscordGateway` module
+
+### Changed
+- Rename `DiscordV10` module to `DiscordREST`
+
 ## [0.0.2]
 ### Added
 - Add `Guild` struct
@@ -28,6 +35,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.0.1]
 This is the initial release.
 
-[Unreleased]: https://github.com/swift-discord/swift-discord/compare/v0.0.2...HEAD
+[Unreleased]: https://github.com/swift-discord/swift-discord/compare/v0.0.3...HEAD
+[0.0.3]: https://github.com/swift-discord/swift-discord/compare/v0.0.2...v0.0.3
 [0.0.2]: https://github.com/swift-discord/swift-discord/compare/v0.0.1...v0.0.2
 [0.0.1]: https://github.com/swift-discord/swift-discord/releases/tag/v0.0.1

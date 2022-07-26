@@ -5,6 +5,9 @@
 //  Created by Jaehong Kang on 2022/07/20.
 //
 
+#if canImport(GlibC)
+import GlibC
+#endif
 import Foundation
 #if canImport(FoundationNetworking)
 import FoundationNetworking
@@ -41,10 +44,10 @@ open class TestCase: XCTestCase {
         ProcessInfo.processInfo.environment["DISCORD_OAUTH2_REFRESH_TOKEN"]
     }
 
-    open class var sessionConfiguration: Session.Configuration {
+    open class var sessionConfiguration: RESTSession.Configuration {
         let urlSessionConfiguration = URLSessionConfiguration.default
 
-        return Session.Configuration(
+        return RESTSession.Configuration(
             urlSessionConfiguration: urlSessionConfiguration,
             oAuth2ClientID: Self.oAuth2ClientID,
             oAuth2ClientSecret: Self.oAuth2ClientSecret
@@ -68,7 +71,15 @@ open class TestCase: XCTestCase {
         )
     }
 
-    open class var session: Session {
-        Session(configuration: Self.sessionConfiguration)
+    open class var session: RESTSession {
+        RESTSession(configuration: Self.sessionConfiguration)
+    }
+
+    open override class func setUp() {
+        super.setUp()
+
+        #if canImport(GlibC)
+        setbuf(stdout, nil)
+        #endif
     }
 }

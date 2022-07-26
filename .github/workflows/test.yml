@@ -32,12 +32,22 @@ jobs:
       - uses: sinoru/actions-setup-swift@v2
         with:
           swift-version: ${{ matrix.swift-version }}
+      - uses: actions/cache@v3
+        id: cache
+        with:
+          path: .build
+          key: ${{ matrix.operating-system }}-swift-${{ env.SWIFT_VERSION }}-${{ hashFiles('**/Package.resolved') }}
+          restore-keys: |
+            ${{ matrix.operating-system }}-swift-${{ env.SWIFT_VERSION }}-
+            ${{ matrix.operating-system }}-swift-
+      - name: Resolve Package Dependencies
+        run: swift package resolve
       - name: Build
-        run: swift build
+        run: swift build --disable-automatic-resolution --build-tests
         env:
           SWIFT_VERSION: ${{ matrix.swift-version }}
       - name: Run tests
-        run: swift test
+        run: swift test --disable-automatic-resolution --skip-build
         env:
           SWIFT_VERSION: ${{ matrix.swift-version }}
   xcode-test:
@@ -45,16 +55,26 @@ jobs:
       fail-fast: true
       matrix:
         xcode-version: ["13.4.1"]
-        xcode-destination: [
-          "platform=OS X,arch=x86_64",
-          "platform=OS X,arch=x86_64,variant=Mac Catalyst",
-          "platform=iOS Simulator,name=iPhone 12 Pro,OS=latest",
-          "platform=tvOS Simulator,name=Apple TV,OS=latest",
-          "platform=watchOS Simulator,name=Apple Watch Series 6 - 44mm,OS=latest",
+        xcode-destination-platform: [
+          "iOS",
+          "macOS",
+          "macCatalyst",
+          "tvOS",
+          "watchOS",
         ]
         include:
           - xcode-version: "13.4.1"
             operating-system: "macos-12"
+          - xcode-destination-platform: "iOS"
+            xcode-destination: "platform=iOS Simulator,name=iPhone 12 Pro,OS=latest"
+          - xcode-destination-platform: "macOS"
+            xcode-destination: "platform=OS X,arch=x86_64"
+          - xcode-destination-platform: "macCatalyst"
+            xcode-destination: "platform=OS X,arch=x86_64,variant=Mac Catalyst"
+          - xcode-destination-platform: "tvOS"
+            xcode-destination: "platform=tvOS Simulator,name=Apple TV,OS=latest"
+          - xcode-destination-platform: "watchOS"
+            xcode-destination: "platform=watchOS Simulator,name=Apple Watch Series 6 - 44mm,OS=latest"
     runs-on: ${{ matrix.operating-system }}
     steps:
       - uses: actions/checkout@v2
@@ -63,9 +83,19 @@ jobs:
           xcode-version: ${{ matrix.xcode-version }}
           apple-id: ${{ secrets.APPLE_ID }}
           apple-id-password: ${{ secrets.APPLE_ID_PASSWORD }}
+      - uses: actions/cache@v3
+        id: cache
+        with:
+          path: |
+            ~/Library/Developer/Xcode/DerivedData
+          key: ${{ matrix.operating-system }}-Xcode-${{ matrix.xcode-version }}-${{ matrix.xcode-destination-platform }}-${{ hashFiles('**/Package.resolved') }}
+          restore-keys: |
+            ${{ matrix.operating-system }}-Xcode-${{ matrix.xcode-version }}-${{ matrix.xcode-destination-platform }}-
+            ${{ matrix.operating-system }}-Xcode-${{ matrix.xcode-version }}-
+            ${{ matrix.operating-system }}-Xcode-
       - name: Resolve Package Dependencies
         run: xcodebuild -resolvePackageDependencies
-      - name: Analyze
-        run: xcodebuild -scheme swift-discord -destination '${{ matrix.xcode-destination }}' analyze
+      - name: Build & Analyze
+        run: xcodebuild -scheme swift-discord-Package -destination '${{ matrix.xcode-destination }}' -disableAutomaticPackageResolution analyze build-for-testing
       - name: Test
-        run: xcodebuild -scheme swift-discord -destination '${{ matrix.xcode-destination }}' test
+        run: xcodebuild -scheme swift-discord-Package -destination '${{ matrix.xcode-destination }}' -disableAutomaticPackageResolution test-without-building

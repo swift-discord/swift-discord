@@ -6,14 +6,27 @@
 
 A Swift library for Discord API.
 
+## Package Products
+
+* `Discord`, alias library that contains `DiscordREST`, `DiscordGateway`.
+* `DiscordREST`, library that can communicate with Discord's REST API. (Requires Foundation framework)
+* `DiscordGateway`, library that can communicate with Discord's Gateway API. (Requires SwiftNIO, Foundation framework)
+
 ## Available APIs
 
-- [/users/@me](Sources/DiscordV10/User+API.swift#L15-L24)
-- [/users/{user.id}](Sources/DiscordV10/User+API.swift#L28-L35)
-- [/users/@me/guilds](Sources/DiscordV10/Guild+API.swift#L15-L24)
-- [/guilds/{guild.id}](Sources/DiscordV10/Guild+API.swift#L28-L35)
-- [/channels/{channel.id}](Sources/DiscordV10/Channel+API.swift#L15-L22)
-- [/guilds/{guild.id}/channels](Sources/DiscordV10/Channel+API.swift#L26-L35)
+- [/users/@me](Sources/DiscordREST/User+API.swift#L15-L24)
+- [/users/{user.id}](Sources/DiscordREST/User+API.swift#L28-L35)
+- [/users/@me/guilds](Sources/DiscordREST/Guild+API.swift#L15-L24)
+- [/guilds/{guild.id}](Sources/DiscordREST/Guild+API.swift#L28-L35)
+- [/channels/{channel.id}](Sources/DiscordREST/Channel+API.swift#L15-L22)
+- [/guilds/{guild.id}/channels](Sources/DiscordREST/Channel+API.swift#L26-L35)
+
+## Supported Platforms
+
+swift-discord aims to support all of the platforms where Swift is supported. Currently, it is developed and tested on macOS and Linux, and is known to support the following operating system versions:
+
+* Ubuntu 18.04+
+* macOS 10.15+, iOS 13+, tvOS 13+ or watchOS 6+
 
 ## Using **swift-discord** in your project
 
@@ -28,14 +41,14 @@ let package = Package(
   dependencies: [
     .package(
       url: "https://github.com/swift-discord/swift-discord.git", 
-      .upToNextMajor(from: "0.0.2") // or `.upToNextMinor
+      .upToNextMajor(from: "0.0.3") // or `.upToNextMinor
     )
   ],
   targets: [
     .target(
       name: "MyTarget",
       dependencies: [
-        .product(name: "DiscordV10", package: "swift-discord")
+        .product(name: "Discord", package: "swift-discord")
       ]
     )
   ]

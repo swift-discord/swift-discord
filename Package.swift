@@ -16,34 +16,77 @@ let package = Package(
         // Products define the executables and libraries a package produces, and make them visible to other packages.
         .library(
             name: "Discord",
-            targets: ["DiscordV10", "Discord"]),
+            targets: ["Discord"]),
+        .library(
+            name: "DiscordREST",
+            targets: ["DiscordREST"]),
+        .library(
+            name: "DiscordGateway",
+            targets: ["DiscordGateway"]),
     ],
     dependencies: [
         // Dependencies declare other packages that this package depends on.
         // .package(url: /* package url */, from: "1.0.0"),
-        .package(url: "https://github.com/apple/swift-collections.git", .upToNextMajor(from: "1.0.0")),
+        .package(url: "https://github.com/apple/swift-algorithms.git", .upToNextMajor(from: "1.0.0")),
+        .package(url: "https://github.com/apple/swift-nio.git", .upToNextMajor(from: "2.40.0")),
+        .package(url: "https://github.com/apple/swift-nio-ssl.git", .upToNextMajor(from: "2.20.2")),
+        .package(url: "https://github.com/apple/swift-nio-transport-services.git", .upToNextMajor(from: "1.13.0")),
         .package(url: "https://github.com/sinoru/swift-snowflake", .upToNextMinor(from: "0.0.1")),
     ],
     targets: [
         // Targets are the basic building blocks of a package. A target can define a module or a test suite.
         // Targets can depend on other targets in this package, and on products in packages this package depends on.
         .target(
-            name: "DiscordV10",
-            dependencies: ["Discord"]),
-        .target(
             name: "Discord",
+            dependencies: ["DiscordREST", "DiscordGateway"]),
+        .target(
+            name: "DiscordCore",
             dependencies: [
-                .product(name: "Collections", package: "swift-collections"),
                 .product(name: "Snowflake", package: "swift-snowflake")
+            ]),
+        .target(
+            name: "DiscordREST",
+            dependencies: ["DiscordRESTModel"]),
+        .target(
+            name: "DiscordRESTModel",
+            dependencies: [
+                "DiscordCore"
+            ]),
+        .target(
+            name: "DiscordGateway",
+            dependencies: [
+                "DiscordCore",
+                "WebSocket",
             ]),
         .target(
             name: "_DiscordTestSupport",
             dependencies: ["Discord"]),
+        .target(
+            name: "WebSocket",
+            dependencies: [
+                .product(name: "Algorithms", package: "swift-algorithms"),
+                .product(name: "NIOCore", package: "swift-nio"),
+                .product(name: "NIOPosix", package: "swift-nio"),
+                .product(name: "NIOFoundationCompat", package: "swift-nio"),
+                .product(name: "NIOHTTP1", package: "swift-nio"),
+                .product(name: "NIOWebSocket", package: "swift-nio"),
+                .product(
+                    name: "NIOTransportServices",
+                    package: "swift-nio-transport-services",
+                    condition: .when(platforms: [.iOS, .macOS, .tvOS, .watchOS, .macCatalyst])),
+                .product(
+                    name: "NIOSSL",
+                    package: "swift-nio-ssl",
+                    condition: .when(platforms: [.android, .linux, .windows])),
+            ]),
         .testTarget(
-            name: "DiscordV10Tests",
-            dependencies: ["DiscordV10", "_DiscordTestSupport"]),
+            name: "DiscordRESTTests",
+            dependencies: ["DiscordREST", "_DiscordTestSupport"]),
         .testTarget(
-            name: "DiscordTests",
-            dependencies: ["Discord", "_DiscordTestSupport"]),
+            name: "DiscordRESTModelTests",
+            dependencies: ["DiscordRESTModel", "_DiscordTestSupport"]),
+        .testTarget(
+            name: "DiscordGatewayTests",
+            dependencies: ["DiscordGateway", "_DiscordTestSupport"]),
     ]
 )
