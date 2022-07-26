@@ -36,10 +36,10 @@ jobs:
         id: cache
         with:
           path: .build
-          key: ${{ runner.os }}-swift-${{ env.SWIFT_VERSION }}-${{ hashFiles('**/Package.resolved') }}
+          key: ${{ matrix.operating-system }}-swift-${{ env.SWIFT_VERSION }}-${{ hashFiles('**/Package.resolved') }}
           restore-keys: |
-            ${{ runner.os }}-swift-${{ env.SWIFT_VERSION }}-
-            ${{ runner.os }}-swift-
+            ${{ matrix.operating-system }}-swift-${{ env.SWIFT_VERSION }}-
+            ${{ matrix.operating-system }}-swift-
       - name: Build
         run: swift build
         env:
@@ -71,6 +71,14 @@ jobs:
           xcode-version: ${{ matrix.xcode-version }}
           apple-id: ${{ secrets.APPLE_ID }}
           apple-id-password: ${{ secrets.APPLE_ID_PASSWORD }}
+      - uses: actions/cache@v3
+        id: cache
+        with:
+          path: |
+            ~/Library/Developer/Xcode/DerivedData
+          key: ${{ matrix.operating-system }}-Xcode-${{ env.xcode-version }}
+          restore-keys: |
+            ${{ matrix.operating-system }}-Xcode-
       - name: Resolve Package Dependencies
         run: xcodebuild -resolvePackageDependencies
       - name: Analyze
