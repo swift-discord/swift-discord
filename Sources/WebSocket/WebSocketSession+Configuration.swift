@@ -25,7 +25,9 @@ extension WebSocketSession {
         }
 
         deinit {
-            try? eventLoopGroup.syncShutdownGracefully()
+            Task.detached(priority: .utility) { [eventLoopGroup] in
+                try await eventLoopGroup.shutdownGracefully()
+            }
         }
     }
 
