@@ -11,7 +11,7 @@ import _DiscordTestSupport
 @testable import DiscordREST
 
 final class ChannelAPITests: TestCase {
-    var session: Session!
+    var session: RESTSession!
 
     override func setUp() async throws {
         // Put setup code here. This method is called before the invocation of each test method in the class.

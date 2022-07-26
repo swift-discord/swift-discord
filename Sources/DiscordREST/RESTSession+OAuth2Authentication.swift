@@ -1,5 +1,5 @@
 //
-//  Session+OAuth2Authentication.swift
+//  RESTSession+OAuth2Authentication.swift
 //  
 //
 //  Created by Jaehong Kang on 2022/07/20.
@@ -9,7 +9,7 @@
 
 import AuthenticationServices
 
-extension Session {
+extension RESTSession {
     @available(iOS 12.0, macOS 10.15, macCatalyst 13.0, watchOS 6.2, *)
     public func oAuth2Authorize(
         scopes: OAuth2Credential.Scopes,

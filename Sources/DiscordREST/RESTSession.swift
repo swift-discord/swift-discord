@@ -1,5 +1,5 @@
 //
-//  Session.swift
+//  RESTSession.swift
 //  
 //
 //  Created by Jaehong Kang on 2022/07/19.
@@ -10,7 +10,7 @@ import Foundation
 import FoundationNetworking
 #endif
 
-public actor Session {
+public actor RESTSession {
     public let configuration: Configuration
     public private(set) var oAuth2Credential: OAuth2Credential?
 
@@ -26,13 +26,13 @@ public actor Session {
     }
 }
 
-extension Session {
+extension RESTSession {
     public func updateOAuth2Credential(_ oAuth2Credential: OAuth2Credential?) {
         self.oAuth2Credential = oAuth2Credential
     }
 }
 
-extension Session {
+extension RESTSession {
     public func data(for request: URLRequest, includesOAuth2Credential: Bool = false) async throws -> (Data, URLResponse) {
         var request = request
 

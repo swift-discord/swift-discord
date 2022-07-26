@@ -11,7 +11,7 @@ import FoundationNetworking
 #endif
 
 extension Guild {
-    public static func myGuilds(session: Session) async throws -> [Guild] {
+    public static func myGuilds(session: RESTSession) async throws -> [Guild] {
         var urlRequest = URLRequest(url: URL(discordAPIPath: "users/@me/guilds", apiVersion: session.configuration.apiVersion)!)
         urlRequest.httpMethod = "GET"
 
@@ -24,7 +24,7 @@ extension Guild {
 }
 
 extension Guild {
-    public init(guildID: Snowflake, session: Session) async throws {
+    public init(guildID: Snowflake, session: RESTSession) async throws {
         var urlRequest = URLRequest(url: URL(discordAPIPath: "guilds/\(guildID.rawValue)", apiVersion: session.configuration.apiVersion)!)
         urlRequest.httpMethod = "GET"
 

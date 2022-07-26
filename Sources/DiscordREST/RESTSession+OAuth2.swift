@@ -1,5 +1,5 @@
 //
-//  Session+OAuth2.swift
+//  RESTSession+OAuth2.swift
 //  
 //
 //  Created by Jaehong Kang on 2022/07/20.
@@ -10,7 +10,7 @@ import Foundation
 import FoundationNetworking
 #endif
 
-extension Session {
+extension RESTSession {
     public enum OAuth2AuthorizationResponseType: String {
         case code
         case token

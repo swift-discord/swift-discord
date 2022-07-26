@@ -11,7 +11,7 @@ import FoundationNetworking
 #endif
 
 extension User {
-    public static func me(session: Session) async throws -> User {
+    public static func me(session: RESTSession) async throws -> User {
         var urlRequest = URLRequest(url: URL(discordAPIPath: "users/@me", apiVersion: session.configuration.apiVersion)!)
         urlRequest.httpMethod = "GET"
 
@@ -24,7 +24,7 @@ extension User {
 }
 
 extension User {
-    public init(userID: Snowflake, session: Session) async throws {
+    public init(userID: Snowflake, session: RESTSession) async throws {
         var urlRequest = URLRequest(url: URL(discordAPIPath: "users/\(userID.rawValue)", apiVersion: session.configuration.apiVersion)!)
         urlRequest.httpMethod = "GET"
 

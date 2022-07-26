@@ -1,5 +1,5 @@
 //
-//  Session+Configuration.swift
+//  RESTSession+Configuration.swift
 //  
 //
 //  Created by Jaehong Kang on 2022/07/20.
@@ -11,7 +11,7 @@ import FoundationNetworking
 #endif
 import DiscordCore
 
-extension Session {
+extension RESTSession {
     public struct Configuration {
         public let urlSessionConfiguration: URLSessionConfiguration
 

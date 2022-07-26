@@ -11,7 +11,7 @@ import FoundationNetworking
 #endif
 
 extension Channel {
-    public init(channelID: Snowflake, session: Session) async throws {
+    public init(channelID: Snowflake, session: RESTSession) async throws {
         var urlRequest = URLRequest(url: URL(discordAPIPath: "channels/\(channelID.rawValue)", apiVersion: session.configuration.apiVersion)!)
         urlRequest.httpMethod = "GET"
 
@@ -22,7 +22,7 @@ extension Channel {
 }
 
 extension Channel {
-    public static func channels(forGuildID guildID: Snowflake, session: Session) async throws -> [Channel] {
+    public static func channels(forGuildID guildID: Snowflake, session: RESTSession) async throws -> [Channel] {
         var urlRequest = URLRequest(url: URL(discordAPIPath: "guilds/\(guildID)/channels", apiVersion: session.configuration.apiVersion)!)
         urlRequest.httpMethod = "GET"
 

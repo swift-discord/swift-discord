@@ -11,7 +11,7 @@ import _DiscordTestSupport
 @testable import DiscordREST
 
 final class UserAPITests: TestCase {
-    var session: Session!
+    var session: RESTSession!
 
     override func setUp() async throws {
         session = Self.session
