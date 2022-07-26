@@ -32,6 +32,14 @@ jobs:
       - uses: sinoru/actions-setup-swift@v2
         with:
           swift-version: ${{ matrix.swift-version }}
+      - uses: actions/cache@v3
+        id: cache
+        with:
+          path: .build
+          key: ${{ runner.os }}-swift-${{ env.SWIFT_VERSION }}-${{ hashFiles('**/Package.resolved') }}
+          restore-keys: |
+            ${{ runner.os }}-swift-${{ env.SWIFT_VERSION }}-
+            ${{ runner.os }}-swift-
       - name: Build
         run: swift build
         env:
