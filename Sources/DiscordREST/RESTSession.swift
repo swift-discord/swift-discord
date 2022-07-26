@@ -37,7 +37,7 @@ extension RESTSession {
         var request = request
 
         if includesOAuth2Credential, let oAuth2Credential = oAuth2Credential {
-            guard oAuth2Credential.validityPeriod.contains(Date()) else {
+            guard oAuth2Credential.isValid else {
                 try await refreshOAuth2Credential()
                 return try await data(for: request, includesOAuth2Credential: includesOAuth2Credential)
             }

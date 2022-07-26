@@ -58,3 +58,18 @@ extension OAuth2Credential {
         self.scopes = scopes
     }
 }
+
+extension OAuth2Credential {
+    public var isValid: Bool {
+        isValid(at: Date())
+    }
+
+    public func isValid(at date: Date) -> Bool {
+        // Workaround: https://github.com/apple/swift-corelibs-foundation/issues/4588
+        #if swift(>=5.7) || os(iOS) || os(macOS) || os(watchOS) || os(tvOS)
+        validityPeriod.contains(date)
+        #else
+        (validityPeriod.start...validityPeriod.end).contains(date)
+        #endif
+    }
+}
