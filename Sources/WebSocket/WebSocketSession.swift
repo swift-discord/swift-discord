@@ -60,7 +60,7 @@ extension WebSocketSession {
 
             do {
                 return try NIOSSLClientHandler(context: context, serverHostname: url.host)
-            } catch NIOSSLExtraError.cannotUseIPAddressInSNI {
+            } catch let error as NIOSSLExtraError where error == NIOSSLExtraError.cannotUseIPAddressInSNI {
                 return try NIOSSLClientHandler(context: context, serverHostname: nil)
             }
         }()
