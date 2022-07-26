@@ -66,7 +66,6 @@ extension GatewaySession: WebSocketSessionDelegate {
                 self.lastHeartbeatACKDate = Date()
             default:
                 dump(message)
-                break
             }
 
             sequence = payload.sequence ?? sequence

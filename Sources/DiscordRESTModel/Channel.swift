@@ -73,7 +73,7 @@ public struct Channel: Equatable, Hashable, Identifiable, Sendable {
     public let guildID: Snowflake?
 
     public let position: Int?
-    
+
     public let permissionOverwrites: [Overwrite]?
 
     public let name: String?
@@ -110,7 +110,6 @@ public struct Channel: Equatable, Hashable, Identifiable, Sendable {
     public let permissions: String?
     public let flags: Flags?
 }
-
 
 extension Channel.ThreadMember: Codable {
     enum CodingKeys: String, CodingKey {
