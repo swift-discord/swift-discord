@@ -76,7 +76,7 @@ jobs:
         with:
           path: |
             ~/Library/Developer/Xcode/DerivedData
-          key: ${{ matrix.operating-system }}-Xcode-${{ env.xcode-version }}
+          key: ${{ matrix.operating-system }}-Xcode-${{ matrix.xcode-version }}
           restore-keys: |
             ${{ matrix.operating-system }}-Xcode-
       - name: Resolve Package Dependencies
