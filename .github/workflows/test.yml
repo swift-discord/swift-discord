@@ -82,6 +82,6 @@ jobs:
       - name: Resolve Package Dependencies
         run: xcodebuild -resolvePackageDependencies
       - name: Analyze
-        run: xcodebuild -scheme swift-discord-Package -destination '${{ matrix.xcode-destination }}' analyze
+        run: xcodebuild -scheme swift-discord-Package -destination '${{ matrix.xcode-destination }}' -disableAutomaticPackageResolution analyze
       - name: Test
-        run: xcodebuild -scheme swift-discord-Package -destination '${{ matrix.xcode-destination }}' test
+        run: xcodebuild -scheme swift-discord-Package -destination '${{ matrix.xcode-destination }}' -disableAutomaticPackageResolution test
