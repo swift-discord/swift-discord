@@ -41,7 +41,7 @@ jobs:
             ${{ matrix.operating-system }}-swift-${{ env.SWIFT_VERSION }}-
             ${{ matrix.operating-system }}-swift-
       - name: Resolve Package Dependencies
-        run: swift resolve
+        run: swift package resolve
       - name: Build
         run: swift build --disable-automatic-resolution --build-tests
         env:
