@@ -63,7 +63,7 @@ extension WebSocketSession {
             } catch NIOSSLExtraError.cannotUseIPAddressInSNI {
                 return try NIOSSLClientHandler(context: context, serverHostname: nil)
             }
-        }
+        }()
         #endif
 
         self.channel = try await bootstrap
