@@ -52,6 +52,18 @@ extension WebSocketSession {
         if url.scheme == "wss" {
             bootstrap = bootstrap.tlsOptions(NWProtocolTLS.Options())
         }
+        #elseif canImport(NIOSSL)
+        let sslClientHandler: NIOSSLClientHandler? = try {
+            guard url.scheme == "wss" else { return nil }
+
+            let context = try NIOSSLContext(configuration: .clientDefault)
+
+            do {
+                return try NIOSSLClientHandler(context: context, serverHostname: url.host)
+            } catch NIOSSLExtraError.cannotUseIPAddressInSNI {
+                return try NIOSSLClientHandler(context: context, serverHostname: nil)
+            }
+        }
         #endif
 
         self.channel = try await bootstrap
@@ -75,16 +87,7 @@ extension WebSocketSession {
 
                 let sslPromise: EventLoopFuture<Void>
                 #if canImport(NIOSSL)
-                if url.scheme == "wss" {
-                    let sslContext = try NIOSSLContext(configuration: .clientDefault)
-                    let sslClientHandler: NIOSSLClientHandler = try {
-                        do {
-                            return try NIOSSLClientHandler(context: context, serverHostname: url.host)
-                        } catch NIOSSLExtraError.cannotUseIPAddressInSNI {
-                            return try NIOSSLClientHandler(context: context, serverHostname: nil)
-                        }
-                    }()
-
+                if let sslClientHandler = sslClientHandler {
                     sslPromise = channel.pipeline.addHandler(sslClientHandler)
                 } else {
                     sslPromise = channel.eventLoop.makeSucceededVoidFuture()
