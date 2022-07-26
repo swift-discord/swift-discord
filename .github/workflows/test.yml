@@ -40,12 +40,14 @@ jobs:
           restore-keys: |
             ${{ matrix.operating-system }}-swift-${{ env.SWIFT_VERSION }}-
             ${{ matrix.operating-system }}-swift-
+      - name: Resolve Package Dependencies
+        run: swift resolve
       - name: Build
-        run: swift build
+        run: swift build --disable-automatic-resolution --build-tests
         env:
           SWIFT_VERSION: ${{ matrix.swift-version }}
       - name: Run tests
-        run: swift test
+        run: swift test --disable-automatic-resolution --skip-build
         env:
           SWIFT_VERSION: ${{ matrix.swift-version }}
   xcode-test:
