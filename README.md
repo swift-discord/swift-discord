@@ -8,7 +8,7 @@ A Swift library for Discord API.
 
 ## Package Products
 
-* `Discord`, main library that contains `DiscordREST`, `DiscordGateway`.
+* `Discord`, alias library that contains `DiscordREST`, `DiscordGateway`.
 * `DiscordREST`, library that can communicate with Discord's REST API. (Requires Foundation framework)
 * `DiscordGateway`, library that can communicate with Discord's Gateway API. (Requires SwiftNIO, Foundation framework)
 
