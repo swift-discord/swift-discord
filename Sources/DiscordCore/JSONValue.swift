@@ -8,8 +8,8 @@
 import Foundation
 
 public enum JSONValue: Sendable, Equatable, Hashable {
-    public typealias Object = Dictionary<String, JSONValue?>
-    public typealias Array = Swift.Array<JSONValue?>
+    public typealias Object = [String: JSONValue?]
+    public typealias Array = [JSONValue?]
     public typealias Number = JSONNumber
 
     case object(Object)
