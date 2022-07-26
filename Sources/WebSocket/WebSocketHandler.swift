@@ -27,7 +27,7 @@ extension WebSocketHandler: ChannelInboundHandler {
             return
         }
 
-        print("WebSocket handler added.")
+        debugPrint("WebSocket handler added.")
     }
 
     func handlerRemoved(context: ChannelHandlerContext) {
@@ -36,7 +36,7 @@ extension WebSocketHandler: ChannelInboundHandler {
             return
         }
 
-        print("WebSocket handler removed.")
+        debugPrint("WebSocket handler removed.")
     }
 
     func channelRead(context: ChannelHandlerContext, data: NIOAny) {
