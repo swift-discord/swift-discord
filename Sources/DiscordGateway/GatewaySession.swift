@@ -29,8 +29,9 @@ extension GatewaySession {
     }
 
     public func connect() async throws {
-        self.webSocketSession = WebSocketSession(gatewayURL: Self.gatewayURL, configuration: .init(), delegate: self)
-        try await self.webSocketSession!.connect()
+        let webSocketSession = WebSocketSession(gatewayURL: Self.gatewayURL, configuration: .init(), delegate: self)
+        self.webSocketSession = webSocketSession
+        try await webSocketSession.connect()
     }
 
     public func disconnect() throws {
