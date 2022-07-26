@@ -40,10 +40,10 @@ public class WebSocketSession {
 extension WebSocketSession {
     public func connect() async throws {
         #if canImport(NIOTransportServices)
-        let bootstrap = NIOTSConnectionBootstrap(group: configuration.eventLoopGroup)
+        let bootstrap = NIOTSConnectionBootstrap(group: configuration.threadPool.eventLoopGroup)
             .tlsOptions(NWProtocolTLS.Options())
         #else
-        let bootstrap = ClientBootstrap(group: configuration.eventLoopGroup)
+        let bootstrap = ClientBootstrap(group: configuration.threadPool.eventLoopGroup)
         #endif
 
         self.channel = try await bootstrap

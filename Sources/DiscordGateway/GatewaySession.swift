@@ -21,10 +21,6 @@ public actor GatewaySession {
     public init(authenticationToken: String) {
         self.authenticationToken = authenticationToken
     }
-
-//    deinit {
-//        eventLoopGroup.shutdownGracefully { _ in }
-//    }
 }
 
 extension GatewaySession {

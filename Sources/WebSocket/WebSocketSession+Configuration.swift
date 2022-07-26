@@ -13,21 +13,27 @@ import NIOPosix
 #endif
 
 extension WebSocketSession {
-    public struct Configuration {
-        public var eventLoopGroup: EventLoopGroup
+    public actor ThreadPool {
+        let eventLoopGroup: EventLoopGroup
 
-        public init(eventLoopGroup: EventLoopGroup = Self.defaultEventLoopGroup) {
-            self.eventLoopGroup = eventLoopGroup
+        public init(threadCount: Int = 1) {
+            #if canImport(NIOTransportServices)
+            self.eventLoopGroup = NIOTSEventLoopGroup(loopCount: threadCount, defaultQoS: .default)
+            #else
+            self.eventLoopGroup = MultiThreadedEventLoopGroup(numberOfThreads: threadCount)
+            #endif
+        }
+
+        deinit {
+            try? eventLoopGroup.syncShutdownGracefully()
         }
     }
-}
 
-extension WebSocketSession.Configuration {
-    public static var defaultEventLoopGroup: EventLoopGroup {
-        #if canImport(NIOTransportServices)
-        return NIOTSEventLoopGroup(loopCount: 1, defaultQoS: .default)
-        #else
-        return MultiThreadedEventLoopGroup(numberOfThreads: 1)
-        #endif
+    public struct Configuration {
+        public var threadPool: ThreadPool
+
+        public init(threadPool: ThreadPool = ThreadPool()) {
+            self.threadPool = threadPool
+        }
     }
 }
