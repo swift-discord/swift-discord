@@ -20,6 +20,9 @@ extension Guild {
         do {
             return try JSONDecoder.discord.decode([Guild].self, from: data)
         } catch {
+            if let error = try? JSONDecoder.discord.decode(RateLimit.self, from: data) {
+                throw error
+            }
             if let error = try? JSONDecoder.discord.decode(RESTError.self, from: data) {
                 throw error
             }
@@ -38,6 +41,9 @@ extension Guild {
         do {
             self = try JSONDecoder.discord.decode(Guild.self, from: data)
         } catch {
+            if let error = try? JSONDecoder.discord.decode(RateLimit.self, from: data) {
+                throw error
+            }
             if let error = try? JSONDecoder.discord.decode(RESTError.self, from: data) {
                 throw error
             }

@@ -23,6 +23,9 @@ extension Gateway.Bot {
             self = try JSONDecoder.discord.decode(Self.self, from: data)
         }
         catch {
+            if let error = try? JSONDecoder.discord.decode(RateLimit.self, from: data) {
+                throw error
+            }
             if let error = try? JSONDecoder.discord.decode(RESTError.self, from: data) {
                 throw error
             }
