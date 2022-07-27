@@ -17,9 +17,15 @@ extension Guild {
 
         let (data, _) = try await session.data(for: urlRequest, includesOAuth2Credential: true)
 
-        let guilds = try JSONDecoder.discord.decode([Guild].self, from: data)
-
-        return guilds
+        do {
+            return try JSONDecoder.discord.decode([Guild].self, from: data)
+        }
+        catch {
+            if let error = try? JSONDecoder.discord.decode(DiscordRESTError.self, from: data) {
+                throw error
+            }
+            throw error
+        }
     }
 }
 
@@ -30,6 +36,14 @@ extension Guild {
 
         let (data, _) = try await session.data(for: urlRequest, includesOAuth2Credential: true)
 
-        self = try JSONDecoder.discord.decode(Guild.self, from: data)
+        do {
+            self = try JSONDecoder.discord.decode(Guild.self, from: data)
+        }
+        catch {
+            if let error = try? JSONDecoder.discord.decode(DiscordRESTError.self, from: data) {
+                throw error
+            }
+            throw error
+        }
     }
 }
