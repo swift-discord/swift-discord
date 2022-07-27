@@ -19,8 +19,7 @@ extension User {
 
         do {
             return try JSONDecoder.discord.decode(User.self, from: data)
-        }
-        catch {
+        } catch {
             if let error = try? JSONDecoder.discord.decode(DiscordRESTError.self, from: data) {
                 throw error
             }
@@ -38,8 +37,7 @@ extension User {
 
         do {
             self = try JSONDecoder.discord.decode(User.self, from: data)
-        }
-        catch {
+        } catch {
             if let error = try? JSONDecoder.discord.decode(DiscordRESTError.self, from: data) {
                 throw error
             }

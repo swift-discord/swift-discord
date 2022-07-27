@@ -19,8 +19,7 @@ extension Guild {
 
         do {
             return try JSONDecoder.discord.decode([Guild].self, from: data)
-        }
-        catch {
+        } catch {
             if let error = try? JSONDecoder.discord.decode(DiscordRESTError.self, from: data) {
                 throw error
             }
@@ -38,8 +37,7 @@ extension Guild {
 
         do {
             self = try JSONDecoder.discord.decode(Guild.self, from: data)
-        }
-        catch {
+        } catch {
             if let error = try? JSONDecoder.discord.decode(DiscordRESTError.self, from: data) {
                 throw error
             }

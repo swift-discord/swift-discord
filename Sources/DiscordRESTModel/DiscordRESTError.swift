@@ -86,8 +86,7 @@ extension DiscordRESTError: Decodable {
                     do {
                         let container = try container.nestedContainer(keyedBy: CodingKeys.self)
                         underlyingErrors.append(try .init(from: container))
-                    }
-                    catch {
+                    } catch {
                         dump(error)
                         fatalError()
                     }
@@ -96,8 +95,7 @@ extension DiscordRESTError: Decodable {
             }
             if let error = try? underlyingErrors(container: container) {
                 result.append(error)
-            }
-            else {
+            } else {
                 let keys = container.allKeys
                 let intKeys = keys.compactMap({$0.intValue ?? Int($0.stringValue)})
                 if intKeys.isEmpty {
@@ -122,19 +120,16 @@ extension DiscordRESTError: Decodable {
                         }
                         if let error = try? keyedUnderlyingErrors() {
                             result.append(error)
-                        }
-                        else if let error = try keyedErrors() {
+                        } else if let error = try keyedErrors() {
                             result.append(error)
                         }
                     }
-                }
-                else {
+                } else {
                     for key in keys {
                         let container = try container.nestedContainer(keyedBy: Error.CodingKeys.self, forKey: key)
                         if let error = try? underlyingErrors(container: container) {
                             result.append(error)
-                        }
-                        else {
+                        } else {
                             result.append(.errors(errors: try errors(container: container)))
                         }
                     }
@@ -144,8 +139,7 @@ extension DiscordRESTError: Decodable {
         }
         if container.contains(.errors) {
             self.errors = try errors(container: try container.nestedContainer(keyedBy: Error.CodingKeys.self, forKey: .errors))
-        }
-        else {
+        } else {
             self.errors = []
         }
         message = try container.decode(String.self, forKey: .message)
@@ -165,11 +159,9 @@ extension DiscordRESTError.Code: Codable {
         let container = try decoder.singleValueContainer()
         if let intValue = try? container.decode(Int.self) {
             self = .intValue(intValue)
-        }
-        else if let stringValue = try? container.decode(String.self) {
+        } else if let stringValue = try? container.decode(String.self) {
             self = .stringValue(stringValue)
-        }
-        else {
+        } else {
             throw DecodingError.dataCorrupted(
                 .init(
                     codingPath: container.codingPath,

@@ -73,15 +73,12 @@ final class DiscordRESTErrorTests: XCTestCase {
                             }
                             if key == "platform" {
                                 assertPlatform()
-                            }
-                            else if key == "type" {
+                            } else if key == "type" {
                                 assertType()
-                            }
-                            else {
+                            } else {
                                 XCTFail("\(key) is not equal to platform or type")
                             }
-                        }
-                        else {
+                        } else {
                             XCTFail("case for error does not match to keyedUnderlyingErrors(key:_:)")
                         }
                     }
@@ -91,12 +88,10 @@ final class DiscordRESTErrorTests: XCTestCase {
                     if !assertTypeFlag {
                         XCTFail("assertType() did not called")
                     }
-                }
-                else {
+                } else {
                     XCTFail("case for errors[0] does not match to errors(errors:)")
                 }
-            }
-            else {
+            } else {
                 XCTFail("case for error does not match to keyedErrors(key:errors:)")
             }
         }
@@ -133,8 +128,7 @@ final class DiscordRESTErrorTests: XCTestCase {
                 XCTAssertEqual(errors.count, 1)
                 XCTAssertEqual(errors[0].code, .stringValue("BASE_TYPE_REQUIRED"))
                 XCTAssertEqual(errors[0].message, "This field is required")
-            }
-            else {
+            } else {
                 XCTFail("case for error does not match to keyedUnderlyingErrors(key:_:)")
             }
         }
@@ -168,8 +162,7 @@ final class DiscordRESTErrorTests: XCTestCase {
                 XCTAssertEqual(errors.count, 1)
                 XCTAssertEqual(errors[0].code, .stringValue("APPLICATION_COMMAND_TOO_LARGE"))
                 XCTAssertEqual(errors[0].message, "Command exceeds maximum size (4000)")
-            }
-            else {
+            } else {
                 XCTFail("case for error does not match to underlyingErrors(_:)")
             }
         }
