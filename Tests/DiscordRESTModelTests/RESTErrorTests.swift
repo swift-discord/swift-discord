@@ -10,7 +10,7 @@ import _DiscordTestSupport
 @testable
 import DiscordRESTModel
 
-final class DiscordRESTErrorTests: XCTestCase {
+final class RESTErrorTests: XCTestCase {
 
     func testDecodingArrayError() throws {
         let exampleResponse =
@@ -44,7 +44,7 @@ final class DiscordRESTErrorTests: XCTestCase {
             """
             .data(using: .utf8)!
         let jsonDecoder = JSONDecoder.discord
-        let error = try jsonDecoder.decode(DiscordRESTError.self, from: exampleResponse)
+        let error = try jsonDecoder.decode(RESTError.self, from: exampleResponse)
         XCTAssertEqual(error.code, .intValue(50035))
         do {
             XCTAssertEqual(error.errors.count, 1)
@@ -118,7 +118,7 @@ final class DiscordRESTErrorTests: XCTestCase {
             """
             .data(using: .utf8)!
         let jsonDecoder = JSONDecoder.discord
-        let error = try jsonDecoder.decode(DiscordRESTError.self, from: exampleResponse)
+        let error = try jsonDecoder.decode(RESTError.self, from: exampleResponse)
         XCTAssertEqual(error.code, .intValue(50035))
         do {
             XCTAssertEqual(error.errors.count, 1)
@@ -153,7 +153,7 @@ final class DiscordRESTErrorTests: XCTestCase {
             """
             .data(using: .utf8)!
         let jsonDecoder = JSONDecoder.discord
-        let error = try jsonDecoder.decode(DiscordRESTError.self, from: exampleResponse)
+        let error = try jsonDecoder.decode(RESTError.self, from: exampleResponse)
         XCTAssertEqual(error.code, .intValue(50035))
         do {
             XCTAssertEqual(error.errors.count, 1)

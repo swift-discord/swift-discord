@@ -7,7 +7,7 @@
 
 import protocol Foundation.LocalizedError
 
-public struct DiscordRESTError: Hashable, Sendable {
+public struct RESTError: Hashable, Sendable {
 
     public let code: Code
 
@@ -16,7 +16,7 @@ public struct DiscordRESTError: Hashable, Sendable {
     public let message: String
 }
 
-extension DiscordRESTError {
+extension RESTError {
 
     public enum Code: Hashable, Sendable {
 
@@ -27,9 +27,9 @@ extension DiscordRESTError {
 
     public enum Error: Hashable, Sendable {
 
-        case underlyingErrors([DiscordRESTError])
+        case underlyingErrors([RESTError])
 
-        case keyedUnderlyingErrors(key: String, [DiscordRESTError])
+        case keyedUnderlyingErrors(key: String, [RESTError])
 
         case errors(errors: [Error])
 
@@ -37,14 +37,14 @@ extension DiscordRESTError {
     }
 }
 
-extension DiscordRESTError: CustomStringConvertible {
+extension RESTError: CustomStringConvertible {
 
     public var description: String {
         "<\(Self.self): \(message.debugDescription) (\(code.description)) \(errors.description)>"
     }
 }
 
-extension DiscordRESTError: Decodable {
+extension RESTError: Decodable {
 
     private enum CodingKeys: String, CodingKey {
 
@@ -146,14 +146,14 @@ extension DiscordRESTError: Decodable {
     }
 }
 
-extension DiscordRESTError: LocalizedError {
+extension RESTError: LocalizedError {
 
     public var errorDescription: String? {
         message
     }
 }
 
-extension DiscordRESTError.Code: Codable {
+extension RESTError.Code: Codable {
 
     public init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
@@ -170,7 +170,7 @@ extension DiscordRESTError.Code: Codable {
     }
 }
 
-extension DiscordRESTError.Code: CustomDebugStringConvertible {
+extension RESTError.Code: CustomDebugStringConvertible {
 
     public var debugDescription: String {
         switch self {
@@ -182,7 +182,7 @@ extension DiscordRESTError.Code: CustomDebugStringConvertible {
     }
 }
 
-extension DiscordRESTError.Code: CustomStringConvertible {
+extension RESTError.Code: CustomStringConvertible {
 
     public var description: String {
         switch self {
@@ -194,7 +194,7 @@ extension DiscordRESTError.Code: CustomStringConvertible {
     }
 }
 
-extension DiscordRESTError.Code: Equatable {
+extension RESTError.Code: Equatable {
 
     public static func == (lhs: Self, rhs: Int) -> Bool {
         if case .intValue(let lhs) = lhs {
@@ -225,7 +225,7 @@ extension DiscordRESTError.Code: Equatable {
     }
 }
 
-extension DiscordRESTError.Error {
+extension RESTError.Error {
 
     fileprivate struct CodingKeys: CodingKey {
 
@@ -251,7 +251,7 @@ extension DiscordRESTError.Error {
     }
 }
 
-extension DiscordRESTError.Error: CustomStringConvertible {
+extension RESTError.Error: CustomStringConvertible {
 
     public var description: String {
         switch self {

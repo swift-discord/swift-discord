@@ -20,7 +20,7 @@ extension Channel {
         do {
             self = try JSONDecoder.discord.decode(Channel.self, from: data)
         } catch {
-            if let error = try? JSONDecoder.discord.decode(DiscordRESTError.self, from: data) {
+            if let error = try? JSONDecoder.discord.decode(RESTError.self, from: data) {
                 throw error
             }
             throw error
@@ -38,7 +38,7 @@ extension Channel {
         do {
             return try JSONDecoder.discord.decode([Channel].self, from: data)
         } catch {
-            if let error = try? JSONDecoder.discord.decode(DiscordRESTError.self, from: data) {
+            if let error = try? JSONDecoder.discord.decode(RESTError.self, from: data) {
                 throw error
             }
             throw error
