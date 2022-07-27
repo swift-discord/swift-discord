@@ -222,8 +222,7 @@ extension RESTError.Error {
         else {
             return nil
         }
-        if let _ = try? container.nestedContainer(keyedBy: CodingKeys.self, forKey: CodingKeys._errors)
-        {
+        if let _ = try? container.nestedContainer(keyedBy: CodingKeys.self, forKey: CodingKeys._errors) {
             return nil
         }
         guard var container = try? container.nestedUnkeyedContainer(forKey: CodingKeys._errors)
