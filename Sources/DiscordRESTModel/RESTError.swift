@@ -1,5 +1,5 @@
 //
-//  DiscordRESTError.swift
+//  RESTError.swift
 //  
 //
 //  Created by Mina Her on 2022/07/27.
@@ -55,90 +55,47 @@ extension RESTError: Decodable {
         case message
     }
 
+    fileprivate static func errors(container: KeyedDecodingContainer<Error.CodingKeys>) throws -> [Error] {
+        var result = [Error]()
+        if let error = try? Error.underlyingErrors(container: container) {
+            result.append(error)
+        } else {
+            let keys = container.allKeys
+            let intKeys = keys.compactMap({$0.intValue ?? Int($0.stringValue)})
+            if intKeys.isEmpty {
+                for key in keys {
+                    if let error = try? Error.keyedUnderlyingErrors(key: key, container: container) {
+                        result.append(error)
+                    } else if let error = try Error.keyedErrors(key: key, container: container) {
+                        result.append(error)
+                    }
+                }
+            } else {
+                for key in keys {
+                    let container = try container.nestedContainer(keyedBy: Error.CodingKeys.self, forKey: key)
+                    if let error = try? Error.underlyingErrors(container: container) {
+                        result.append(error)
+                    } else {
+                        result.append(.errors(errors: try Self.errors(container: container)))
+                    }
+                }
+            }
+        }
+        return result
+    }
+
     public init(from decoder: Decoder) throws {
         try self.init(from: try decoder.container(keyedBy: CodingKeys.self))
     }
 
     private init(from container: KeyedDecodingContainer<CodingKeys>) throws {
         code = try container.decode(Code.self, forKey: .code)
-        func errors(container: KeyedDecodingContainer<Error.CodingKeys>) throws -> [Error] {
-            var result = [Error]()
-            func underlyingErrors(container: KeyedDecodingContainer<Error.CodingKeys>) throws -> Error? {
-                guard container.contains(Error.CodingKeys._errors)
-                else {
-                    return nil
-                }
-                if let _ =
-                    try? container.nestedContainer(
-                        keyedBy: Error.CodingKeys.self,
-                        forKey: Error.CodingKeys._errors)
-                {
-                    return nil
-                }
-                guard var container =
-                    try? container.nestedUnkeyedContainer(
-                        forKey: Error.CodingKeys._errors)
-                else {
-                    return nil
-                }
-                var underlyingErrors = [Self]()
-                while !container.isAtEnd {
-                    do {
-                        let container = try container.nestedContainer(keyedBy: CodingKeys.self)
-                        underlyingErrors.append(try .init(from: container))
-                    } catch {
-                        dump(error)
-                        fatalError()
-                    }
-                }
-                return .underlyingErrors(underlyingErrors)
-            }
-            if let error = try? underlyingErrors(container: container) {
-                result.append(error)
-            } else {
-                let keys = container.allKeys
-                let intKeys = keys.compactMap({$0.intValue ?? Int($0.stringValue)})
-                if intKeys.isEmpty {
-                    for key in keys {
-                        func keyedUnderlyingErrors() throws -> Error? {
-                            let container = try container.nestedContainer(keyedBy: Error.CodingKeys.self, forKey: key)
-                            guard
-                                let error = try? underlyingErrors(container: container),
-                                case .underlyingErrors(let underlyingErrors) = error
-                            else {
-                                return nil
-                            }
-                            return .keyedUnderlyingErrors(key: key.stringValue, underlyingErrors)
-                        }
-                        func keyedErrors() throws -> Error? {
-                            let container = try container.nestedContainer(keyedBy: Error.CodingKeys.self, forKey: key)
-                            guard let errors = try? errors(container: container)
-                            else {
-                                return nil
-                            }
-                            return .keyedErrors(key: key.stringValue, errors: errors)
-                        }
-                        if let error = try? keyedUnderlyingErrors() {
-                            result.append(error)
-                        } else if let error = try keyedErrors() {
-                            result.append(error)
-                        }
-                    }
-                } else {
-                    for key in keys {
-                        let container = try container.nestedContainer(keyedBy: Error.CodingKeys.self, forKey: key)
-                        if let error = try? underlyingErrors(container: container) {
-                            result.append(error)
-                        } else {
-                            result.append(.errors(errors: try errors(container: container)))
-                        }
-                    }
-                }
-            }
-            return result
-        }
         if container.contains(.errors) {
-            self.errors = try errors(container: try container.nestedContainer(keyedBy: Error.CodingKeys.self, forKey: .errors))
+            self.errors =
+                try Self.errors(
+                    container: try container.nestedContainer(
+                        keyedBy: Error.CodingKeys.self,
+                        forKey: .errors))
         } else {
             self.errors = []
         }
@@ -166,6 +123,16 @@ extension RESTError.Code: Codable {
                 .init(
                     codingPath: container.codingPath,
                     debugDescription: "Expected to decode Int or String but found other instead."))
+        }
+    }
+
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.singleValueContainer()
+        switch self {
+        case .intValue(let intValue):
+            try container.encode(intValue)
+        case .stringValue(let stringValue):
+            try container.encode(stringValue)
         }
     }
 }
@@ -248,6 +215,52 @@ extension RESTError.Error {
         fileprivate init(_ stringValue: String) {
             self.init(stringValue: stringValue)!
         }
+    }
+
+    fileprivate static func underlyingErrors(container: KeyedDecodingContainer<CodingKeys>) throws -> Self? {
+        guard container.contains(CodingKeys._errors)
+        else {
+            return nil
+        }
+        if let _ = try? container.nestedContainer(keyedBy: CodingKeys.self, forKey: CodingKeys._errors)
+        {
+            return nil
+        }
+        guard var container = try? container.nestedUnkeyedContainer(forKey: CodingKeys._errors)
+        else {
+            return nil
+        }
+        var underlyingErrors = [RESTError]()
+        while !container.isAtEnd {
+            do {
+                let container = try container.nestedContainer(keyedBy: RESTError.CodingKeys.self)
+                underlyingErrors.append(try .init(from: container))
+            } catch {
+                dump(error)
+                fatalError()
+            }
+        }
+        return .underlyingErrors(underlyingErrors)
+    }
+
+    fileprivate static func keyedUnderlyingErrors(key: CodingKeys, container: KeyedDecodingContainer<CodingKeys>) throws -> Self? {
+        let container = try container.nestedContainer(keyedBy: CodingKeys.self, forKey: key)
+        guard
+            let error = try? underlyingErrors(container: container),
+            case .underlyingErrors(let underlyingErrors) = error
+        else {
+            return nil
+        }
+        return .keyedUnderlyingErrors(key: key.stringValue, underlyingErrors)
+    }
+
+    fileprivate static func keyedErrors(key: CodingKeys, container: KeyedDecodingContainer<CodingKeys>) throws -> Self? {
+        let container = try container.nestedContainer(keyedBy: CodingKeys.self, forKey: key)
+        guard let errors = try? RESTError.errors(container: container)
+        else {
+            return nil
+        }
+        return .keyedErrors(key: key.stringValue, errors: errors)
     }
 }
 

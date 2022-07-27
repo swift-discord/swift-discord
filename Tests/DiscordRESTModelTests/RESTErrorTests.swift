@@ -1,5 +1,5 @@
 //
-//  File.swift
+//  RESTErrorTests.swift
 //  
 //
 //  Created by Mina Her on 2022/07/27.
