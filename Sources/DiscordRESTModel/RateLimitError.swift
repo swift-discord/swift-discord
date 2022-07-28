@@ -1,5 +1,5 @@
 //
-//  RateLimit.swift
+//  RateLimitError.swift
 //  
 //
 //  Created by Mina Her on 2022/07/27.
@@ -7,7 +7,7 @@
 
 import Foundation
 
-public struct RateLimit: Hashable, Sendable {
+public struct RateLimitError: Hashable, Sendable {
 
     public var message: String
 
@@ -16,7 +16,7 @@ public struct RateLimit: Hashable, Sendable {
     public var isGlobal: Bool
 }
 
-extension RateLimit: Codable {
+extension RateLimitError: Codable {
 
     private enum CodingKeys: String, CodingKey {
 
@@ -28,7 +28,7 @@ extension RateLimit: Codable {
     }
 }
 
-extension RateLimit: LocalizedError {
+extension RateLimitError: LocalizedError {
 
     public var errorDescription: String? {
         message

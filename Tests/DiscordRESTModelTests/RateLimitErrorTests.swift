@@ -1,5 +1,5 @@
 //
-//  RateLimitTests.swift
+//  RateLimitErrorTests.swift
 //  
 //
 //  Created by Mina Her on 2022/07/27.
@@ -10,7 +10,7 @@ import _DiscordTestSupport
 @testable
 import DiscordRESTModel
 
-final class RateLimitTests: XCTestCase {
+final class RateLimitErrorTests: XCTestCase {
 
     func testDecodingExampleExceededUserRateLimitResponse() async throws {
         let exampleResponse =
@@ -23,7 +23,7 @@ final class RateLimitTests: XCTestCase {
             """
             .data(using: .utf8)!
         let jsonDecoder = JSONDecoder.discord
-        let rateLimit = try jsonDecoder.decode(RateLimit.self, from: exampleResponse)
+        let rateLimit = try jsonDecoder.decode(RateLimitError.self, from: exampleResponse)
         XCTAssertEqual(rateLimit.message, "You are being rate limited.")
         XCTAssertEqual(rateLimit.retryAfterSeconds, 64.57, accuracy: 0.01)
         XCTAssertEqual(rateLimit.isGlobal, false)
@@ -40,7 +40,7 @@ final class RateLimitTests: XCTestCase {
             """
             .data(using: .utf8)!
         let jsonDecoder = JSONDecoder.discord
-        let rateLimit = try jsonDecoder.decode(RateLimit.self, from: exampleResponse)
+        let rateLimit = try jsonDecoder.decode(RateLimitError.self, from: exampleResponse)
         XCTAssertEqual(rateLimit.message, "The resource is being rate limited.")
         XCTAssertEqual(rateLimit.retryAfterSeconds, 1336.57, accuracy: 0.01)
         XCTAssertEqual(rateLimit.isGlobal, false)
@@ -57,7 +57,7 @@ final class RateLimitTests: XCTestCase {
             """
             .data(using: .utf8)!
         let jsonDecoder = JSONDecoder.discord
-        let rateLimit = try jsonDecoder.decode(RateLimit.self, from: exampleResponse)
+        let rateLimit = try jsonDecoder.decode(RateLimitError.self, from: exampleResponse)
         XCTAssertEqual(rateLimit.message, "You are being rate limited.")
         XCTAssertEqual(rateLimit.retryAfterSeconds, 64.57, accuracy: 0.01)
         XCTAssertEqual(rateLimit.isGlobal, true)
