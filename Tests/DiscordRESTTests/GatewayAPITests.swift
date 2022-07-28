@@ -29,8 +29,7 @@ final class GatewayAPITests: TestCase {
         let gateway = try await Gateway(session: session)
         if gateway.url.lastPathComponent.last == "/" {
             XCTAssertEqual(gateway.url, .init(string: "wss://gateway.discord.gg/")!)
-        }
-        else {
+        } else {
             XCTAssertEqual(gateway.url, .init(string: "wss://gateway.discord.gg")!)
         }
     }
@@ -42,8 +41,7 @@ final class GatewayAPITests: TestCase {
         bot = try await Gateway.Bot(session: session)
         if bot.url.lastPathComponent.last == "/" {
             XCTAssertEqual(bot.url, .init(string: "wss://gateway.discord.gg/")!)
-        }
-        else {
+        } else {
             XCTAssertEqual(bot.url, .init(string: "wss://gateway.discord.gg")!)
         }
         XCTAssertGreaterThan(bot.shards, 0)

@@ -25,8 +25,8 @@ public actor GatewaySession {
     public init(
         apiVersion: DiscordAPIVersion = .latest,
         encoding: Encoding = .json,
-        authenticationToken: String)
-    {
+        authenticationToken: String
+    ) {
         self.apiVersion = apiVersion
         self.encoding = encoding
         self.authenticationToken = authenticationToken
