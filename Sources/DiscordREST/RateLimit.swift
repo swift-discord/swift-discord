@@ -6,6 +6,9 @@
 //
 
 import Foundation
+#if canImport(FoundationNetworking)
+import class FoundationNetworking.HTTPURLResponse
+#endif
 
 public struct RateLimit: Sendable {
 
