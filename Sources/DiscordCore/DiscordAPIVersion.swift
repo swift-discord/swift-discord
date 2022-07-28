@@ -34,3 +34,13 @@ public struct DiscordAPIVersion: Equatable, Hashable, Sendable {
 
     public static let v10: DiscordAPIVersion = .init(versionString: "10")
 }
+
+extension DiscordAPIVersion {
+
+    /// The latest version of Discord API.
+    ///
+    /// Currently, it is `10`.
+    public static var latest: DiscordAPIVersion {
+        v10
+    }
+}
