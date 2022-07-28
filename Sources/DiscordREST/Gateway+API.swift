@@ -12,13 +12,16 @@ import FoundationNetworking
 
 extension Gateway {
 
-    public init(session: RESTSession) async throws {
+    public init(session: RESTSession, rateLimit: inout RateLimit) async throws {
         let urlRequest =
             URLRequest(
                 url: .init(
                     discordAPIPath: "gateway",
                     apiVersion: session.configuration.apiVersion)!)
-        let (data, _) = try await session.data(for: urlRequest)
+        let (data, urlResponse) = try await session.data(for: urlRequest)
+        if let httpURLResponse = urlResponse as? HTTPURLResponse {
+            rateLimit = httpURLResponse.rateLimit
+        }
         do {
             self = try JSONDecoder.discord.decode(Self.self, from: data)
         }
@@ -31,5 +34,11 @@ extension Gateway {
             }
             throw error
         }
+    }
+
+    @inlinable
+    public init(session: RESTSession) async throws {
+        var rateLimit = RateLimit()
+        try await self.init(session: session, rateLimit: &rateLimit)
     }
 }

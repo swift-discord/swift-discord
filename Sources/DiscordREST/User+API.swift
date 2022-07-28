@@ -11,11 +11,14 @@ import FoundationNetworking
 #endif
 
 extension User {
-    public static func me(session: RESTSession) async throws -> User {
+    public static func me(session: RESTSession, rateLimit: inout RateLimit) async throws -> User {
         var urlRequest = URLRequest(url: URL(discordAPIPath: "users/@me", apiVersion: session.configuration.apiVersion)!)
         urlRequest.httpMethod = "GET"
 
-        let (data, _) = try await session.data(for: urlRequest, includesOAuth2Credential: true)
+        let (data, urlResponse) = try await session.data(for: urlRequest, includesOAuth2Credential: true)
+        if let httpURLResponse = urlResponse as? HTTPURLResponse {
+            rateLimit = httpURLResponse.rateLimit
+        }
 
         do {
             return try JSONDecoder.discord.decode(User.self, from: data)
@@ -29,14 +32,23 @@ extension User {
             throw error
         }
     }
+
+    @inlinable
+    public static func me(session: RESTSession) async throws -> User {
+        var rateLimit = RateLimit()
+        return try await me(session: session, rateLimit: &rateLimit)
+    }
 }
 
 extension User {
-    public init(userID: Snowflake, session: RESTSession) async throws {
+    public init(userID: Snowflake, session: RESTSession, rateLimit: inout RateLimit) async throws {
         var urlRequest = URLRequest(url: URL(discordAPIPath: "users/\(userID.rawValue)", apiVersion: session.configuration.apiVersion)!)
         urlRequest.httpMethod = "GET"
 
-        let (data, _) = try await session.data(for: urlRequest, includesOAuth2Credential: true)
+        let (data, urlResponse) = try await session.data(for: urlRequest, includesOAuth2Credential: true)
+        if let httpURLResponse = urlResponse as? HTTPURLResponse {
+            rateLimit = httpURLResponse.rateLimit
+        }
 
         do {
             self = try JSONDecoder.discord.decode(User.self, from: data)
@@ -49,5 +61,11 @@ extension User {
             }
             throw error
         }
+    }
+
+    @inlinable
+    public init(userID: Snowflake, session: RESTSession) async throws {
+        var rateLimit = RateLimit()
+        try await self.init(userID: userID, session: session, rateLimit: &rateLimit)
     }
 }
