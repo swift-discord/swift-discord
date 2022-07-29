@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- New `RESTError` struct. Its value will be thrown if the server returned [error response](https://discord.com/developers/docs/reference#error-messages).
+- New `RateLimitError` struct. Its value will be thrown if the server returned [rate limit response](https://discord.com/developers/docs/topics/rate-limits#exceeding-a-rate-limit-rate-limit-response-structure).
+
 ## [0.0.3]
 ### Added
 - Add `DiscordGateway` module
