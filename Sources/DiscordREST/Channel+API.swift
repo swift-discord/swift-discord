@@ -17,17 +17,7 @@ extension Channel {
 
         let (data, _) = try await session.data(for: urlRequest, includesOAuth2Credential: true)
 
-        do {
-            self = try JSONDecoder.discord.decode(Channel.self, from: data)
-        } catch {
-            if let error = try? JSONDecoder.discord.decode(RateLimitError.self, from: data) {
-                throw error
-            }
-            if let error = try? JSONDecoder.discord.decode(RESTError.self, from: data) {
-                throw error
-            }
-            throw error
-        }
+        self = try JSONDecoder.discord.decode(Channel.self, from: data)
     }
 }
 
@@ -38,16 +28,6 @@ extension Channel {
 
         let (data, _) = try await session.data(for: urlRequest, includesOAuth2Credential: true)
 
-        do {
-            return try JSONDecoder.discord.decode([Channel].self, from: data)
-        } catch {
-            if let error = try? JSONDecoder.discord.decode(RateLimitError.self, from: data) {
-                throw error
-            }
-            if let error = try? JSONDecoder.discord.decode(RESTError.self, from: data) {
-                throw error
-            }
-            throw error
-        }
+        return try JSONDecoder.discord.decode([Channel].self, from: data)
     }
 }

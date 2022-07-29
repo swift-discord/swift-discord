@@ -19,16 +19,6 @@ extension Gateway.Bot {
                     discordAPIPath: "gateway/bot",
                     apiVersion: session.configuration.apiVersion)!)
         let (data, _) = try await session.data(for: urlRequest, includesOAuth2Credential: true)
-        do {
-            self = try JSONDecoder.discord.decode(Self.self, from: data)
-        } catch {
-            if let error = try? JSONDecoder.discord.decode(RateLimitError.self, from: data) {
-                throw error
-            }
-            if let error = try? JSONDecoder.discord.decode(RESTError.self, from: data) {
-                throw error
-            }
-            throw error
-        }
+        self = try JSONDecoder.discord.decode(Self.self, from: data)
     }
 }
