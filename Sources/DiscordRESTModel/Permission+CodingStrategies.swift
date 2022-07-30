@@ -51,19 +51,17 @@ extension CodingUserInfoKey {
 
 extension Decoder {
 
-    public var permissionDecodingStrategy: PermissionDecodingStrategy {
+    internal var permissionDecodingStrategy: PermissionDecodingStrategy {
         userInfo[.permissionDecodingStrategyKey] as? PermissionDecodingStrategy ?? .default
     }
 }
 
 extension Encoder {
 
-    public var permissionEncodingStrategy: PermissionEncodingStrategy {
+    internal var permissionEncodingStrategy: PermissionEncodingStrategy {
         userInfo[.permissionEncodingStrategyKey] as? PermissionEncodingStrategy ?? .default
     }
 }
-
-// MARK: -
 
 extension JSONDecoder {
 
