@@ -64,11 +64,13 @@ extension Guild.Feature {
 
 extension Guild.Feature: Equatable {
 
-    public static func == (lhs: Self, rhs: String) -> Bool {
+    public static func == <S>(lhs: Self, rhs: S) -> Bool
+    where S: StringProtocol {
         lhs.rawValue == rhs
     }
 
-    public static func == (lhs: String, rhs: Self) -> Bool {
+    public static func == <S>(lhs: S, rhs: Self) -> Bool
+    where S: StringProtocol {
         lhs == rhs.rawValue
     }
 }
