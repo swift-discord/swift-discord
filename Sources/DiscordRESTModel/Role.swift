@@ -24,7 +24,7 @@ public struct Role: Equatable, Hashable, Identifiable, Sendable {
     public let unicodeEmoji: String?
     public let position: Int
 
-    public let permissions: String
+    public let permissions: Permission
 
     public let isManaged: Bool
     public let isMentionable: Bool

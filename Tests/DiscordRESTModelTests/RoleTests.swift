@@ -40,7 +40,28 @@ final class RoleTests: XCTestCase {
         XCTAssertEqual(role.unicodeEmoji, nil)
         XCTAssertEqual(role.position, 1)
 
-        XCTAssertEqual(role.permissions, "66321471")
+        XCTAssertEqual(
+            role.permissions,
+            [.createInstantInvite,
+             .kickMembers,
+             .banMembers,
+             .administrator,
+             .manageChannels,
+             .manageGuild,
+             .viewChannel,
+             .sendMessages,
+             .sendTTSMessages,
+             .manageMessages,
+             .embedLinks,
+             .attachFiles,
+             .readMessageHistory,
+             .mentionEveryone,
+             .connect,
+             .speak,
+             .muteMembers,
+             .deafenMembers,
+             .moveMembers,
+             .useVAD])
 
         XCTAssertEqual(role.isManaged, false)
         XCTAssertEqual(role.isMentionable, false)

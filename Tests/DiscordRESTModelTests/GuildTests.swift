@@ -407,7 +407,23 @@ final class GuildTests: TestCase {
         XCTAssertEqual(guild.roles?.count, 1)
         XCTAssertEqual(guild.roles?[0].id, 2909267986263572999)
         XCTAssertEqual(guild.roles?[0].name, "@everyone")
-        XCTAssertEqual(guild.roles?[0].permissions, "49794752")
+        XCTAssertEqual(
+            guild.roles?[0].permissions,
+            [.addReactions,
+             .viewAuditLog,
+             .stream,
+             .viewChannel,
+             .sendMessages,
+             .embedLinks,
+             .attachFiles,
+             .readMessageHistory,
+             .mentionEveryone,
+             .useExternalEmojis,
+             .connect,
+             .speak,
+             .muteMembers,
+             .deafenMembers,
+             .useVAD])
         XCTAssertEqual(guild.roles?[0].position, 0)
         XCTAssertEqual(guild.roles?[0].color, 0)
         XCTAssertEqual(guild.roles?[0].hoist, false)
