@@ -5,6 +5,9 @@
 //  Created by Mina Her on 2022/07/30.
 //
 
+import class Foundation.JSONDecoder
+import class Foundation.JSONEncoder
+
 public enum PermissionDecodingStrategy: Sendable {
 
     case uint64
@@ -57,5 +60,31 @@ extension Encoder {
 
     public var permissionEncodingStrategy: PermissionEncodingStrategy {
         userInfo[.permissionEncodingStrategyKey] as? PermissionEncodingStrategy ?? .default
+    }
+}
+
+// MARK: -
+
+extension JSONDecoder {
+
+    public var permissionDecodingStrategy: PermissionDecodingStrategy {
+        get {
+            userInfo[.permissionDecodingStrategyKey] as? PermissionDecodingStrategy ?? .default
+        }
+        set {
+            userInfo[.permissionDecodingStrategyKey] = newValue
+        }
+    }
+}
+
+extension JSONEncoder {
+
+    public var permissionEncodingStrategy: PermissionEncodingStrategy {
+        get {
+            userInfo[.permissionEncodingStrategyKey] as? PermissionEncodingStrategy ?? .default
+        }
+        set {
+            userInfo[.permissionEncodingStrategyKey] = newValue
+        }
     }
 }
