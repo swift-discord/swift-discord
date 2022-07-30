@@ -89,7 +89,17 @@ final class GuildTests: TestCase {
 
         XCTAssertEqual(guild.roles, [])
         XCTAssertEqual(guild.emojis, [])
-        XCTAssertEqual(guild.features?.count, 9)
+        XCTAssertEqual(
+            guild.features,
+            [.animatedIcon,
+             .verified,
+             .news,
+             .vanityURL,
+             .discoverable,
+             "MORE_EMOJI",
+             .inviteSplash,
+             .banner,
+             .community])
 
         XCTAssertEqual(guild.mfaLevel, .value(.elevated))
 
@@ -266,7 +276,17 @@ final class GuildTests: TestCase {
 
         XCTAssertEqual(guild.roles, nil)
         XCTAssertEqual(guild.emojis, [])
-        XCTAssertEqual(guild.features?.count, 9)
+        XCTAssertEqual(
+            guild.features,
+            [.discoverable,
+             .vanityURL,
+             .animatedIcon,
+             .inviteSplash,
+             .news,
+             .community,
+             .banner,
+             .verified,
+             "MORE_EMOJI"])
 
         XCTAssertEqual(guild.mfaLevel, nil)
 
@@ -431,7 +451,15 @@ final class GuildTests: TestCase {
         XCTAssertEqual(guild.roles?[0].isMentionable, false)
         XCTAssertEqual(guild.emojis?.count, 1)
         XCTAssertEqual(guild.emojis?[0].id, 393564762228785161)
-        XCTAssertEqual(guild.features?.count, 7)
+        XCTAssertEqual(
+            guild.features,
+            [.inviteSplash,
+             .vanityURL,
+             "COMMERCE",
+             .banner,
+             .news,
+             .verified,
+             .vipRegions])
 
         XCTAssertEqual(guild.mfaLevel, .value(.none))
 

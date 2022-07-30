@@ -87,7 +87,7 @@ public struct Guild: Equatable, Hashable, Identifiable, Sendable {
 
     public let roles: [Role]?
     public let emojis: [Emoji]?
-    public let features: [String]?
+    public let features: Set<Feature>?
 
     public let mfaLevel: Unknown<MFALevel>?
 
