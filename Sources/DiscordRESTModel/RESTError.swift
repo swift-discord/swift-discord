@@ -18,6 +18,7 @@ public struct RESTError: Hashable, Sendable {
 
 extension RESTError {
 
+    @frozen
     public enum Code: Hashable, Sendable {
 
         case intValue(Int)

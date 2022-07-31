@@ -7,6 +7,7 @@
 
 extension Guild {
 
+    @frozen
     public struct Feature: Codable, Hashable, RawRepresentable, Sendable {
 
         public var rawValue: String

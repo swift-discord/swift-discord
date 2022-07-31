@@ -5,6 +5,7 @@
 //  Created by Mina Her on 2022/07/30.
 //
 
+@frozen
 public struct Permission: Hashable, OptionSet, Sendable {
 
     public var rawValue: UInt64
