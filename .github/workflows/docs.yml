@@ -1,0 +1,121 @@
+name: Docs
+
+on:
+  push:
+    paths:
+      - '.github/workflows/docs.yml'
+      - '**/*.swift'
+  pull_request:
+    paths:
+      - '.github/workflows/docs.yml'
+      - '**/*.swift'
+
+jobs:
+  build:
+    runs-on: macos-12
+    env:
+      XCODE_VERSION: '13.4.1'
+      SWIFT_VERSION: '5.6.2'
+      ARTIFACT_PATH: '_site/'
+    steps:
+      - uses: actions/checkout@v3
+      - uses: sinoru/actions-setup-xcode@v2
+        if: ${{ startsWith(runner.os, 'macOS') && env.XCODE_VERSION }}
+        with:
+          xcode-version: ${{ env.XCODE_VERSION }}
+          apple-id: ${{ secrets.APPLE_ID }}
+          apple-id-password: ${{ secrets.APPLE_ID_PASSWORD }}
+      - uses: sinoru/actions-setup-swift@v2
+        with:
+          swift-version: ${{ env.SWIFT_VERSION }}
+      - uses: actions/cache@v3
+        id: cache
+        with:
+          path: .build
+          key: ${{ runner.os }}-swift-${{ env.SWIFT_VERSION }}-${{ hashFiles('**/Package.resolved') }}
+          restore-keys: |
+            ${{ runner.os }}-swift-${{ env.SWIFT_VERSION }}-
+            ${{ runner.os }}-swift-
+      - name: Resolve swift package
+        run: swift package resolve
+      - name: Generate Discord documentation
+        run: |
+          swift package --disable-automatic-resolution --allow-writing-to-directory "${{ env.ARTIFACT_PATH }}" \
+            generate-documentation --target Discord \
+            --output-path "${{ env.ARTIFACT_PATH }}" \
+            --transform-for-static-hosting \
+            --hosting-base-path "swift-discord"
+      - name: Generate DiscordCore documentation
+        run: |
+          DOCC_OUTPUT="${{ runner.temp }}/DiscordCore"
+
+          swift package --disable-automatic-resolution --allow-writing-to-directory "$DOCC_OUTPUT" \
+            generate-documentation --target DiscordCore \
+            --output-path "$DOCC_OUTPUT" \
+            --transform-for-static-hosting \
+            --hosting-base-path "swift-discord"
+
+          cp -R "$DOCC_OUTPUT"/* "${{ env.ARTIFACT_PATH }}"
+      - name: Generate DiscordREST documentation
+        run: |
+          DOCC_OUTPUT="${{ runner.temp }}/DiscordREST"
+
+          swift package --disable-automatic-resolution --allow-writing-to-directory "$DOCC_OUTPUT" \
+            generate-documentation --target DiscordREST \
+            --output-path "$DOCC_OUTPUT" \
+            --transform-for-static-hosting \
+            --hosting-base-path "swift-discord"
+
+          cp -R "$DOCC_OUTPUT"/* "${{ env.ARTIFACT_PATH }}"
+      - name: Generate DiscordRESTModel documentation
+        run: |
+          DOCC_OUTPUT="${{ runner.temp }}/DiscordRESTModel"
+
+          swift package --disable-automatic-resolution --allow-writing-to-directory "$DOCC_OUTPUT" \
+            generate-documentation --target DiscordRESTModel \
+            --output-path "$DOCC_OUTPUT" \
+            --transform-for-static-hosting \
+            --hosting-base-path "swift-discord"
+
+          cp -R "$DOCC_OUTPUT"/* "${{ env.ARTIFACT_PATH }}"
+      - name: Generate DiscordGateway documentation
+        run: |
+          DOCC_OUTPUT="${{ runner.temp }}/DiscordGateway"
+
+          swift package --disable-automatic-resolution --allow-writing-to-directory "$DOCC_OUTPUT" \
+            generate-documentation --target DiscordGateway \
+            --output-path "$DOCC_OUTPUT" \
+            --transform-for-static-hosting \
+            --hosting-base-path "swift-discord"
+
+          cp -R "$DOCC_OUTPUT"/* "${{ env.ARTIFACT_PATH }}"
+      - name: Archive artifact
+        run: |
+          tar \
+          --directory ${{ env.ARTIFACT_PATH }} \
+          -cvf ${{ runner.temp }}/artifact.tar \
+          --exclude=.git \
+          --exclude=.github \
+          .
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: github-pages
+          path: ${{ runner.temp }}/artifact.tar
+  deploy:
+    needs: build
+    # if: ${{ github.ref_name == 'main' }}
+
+    permissions:
+      pages: write
+      id-token: write
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v1

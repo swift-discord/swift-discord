@@ -36,10 +36,10 @@ jobs:
         id: cache
         with:
           path: .build
-          key: ${{ matrix.operating-system }}-swift-${{ env.SWIFT_VERSION }}-${{ hashFiles('**/Package.resolved') }}
+          key: ${{ runner.os }}-swift-${{ env.SWIFT_VERSION }}-${{ hashFiles('**/Package.resolved') }}
           restore-keys: |
-            ${{ matrix.operating-system }}-swift-${{ env.SWIFT_VERSION }}-
-            ${{ matrix.operating-system }}-swift-
+            ${{ runner.os }}-swift-${{ env.SWIFT_VERSION }}-
+            ${{ runner.os }}-swift-
       - name: Resolve Package Dependencies
         run: swift package resolve
       - name: Build
