@@ -56,9 +56,12 @@ let package = Package(
         .target(
             name: "DiscordGateway",
             dependencies: [
-                "DiscordCore",
+                "DiscordGatewayModel",
                 "WebSocket",
             ]),
+        .target(
+            name: "DiscordGatewayModel",
+            dependencies: ["DiscordCore"]),
         .target(
             name: "_DiscordTestSupport",
             dependencies: ["Discord"]),
@@ -89,5 +92,11 @@ let package = Package(
         .testTarget(
             name: "DiscordGatewayTests",
             dependencies: ["DiscordGateway", "_DiscordTestSupport"]),
+        .testTarget(
+            name: "DiscordGatewayModelTests",
+            dependencies: [
+                "DiscordGatewayModel",
+                "_DiscordTestSupport",
+            ]),
     ]
 )

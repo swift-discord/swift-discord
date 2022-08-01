@@ -41,24 +41,25 @@ extension GatewaySession: WebSocketSessionDelegate {
     func _didReceiveMessage(_ message: WebSocketSession.Message, context: Context) async {
         do {
             let jsonDecoder = JSONDecoder()
-            let payload: GatewayDynamicPayload = try {
+            let data: Data = {
                 switch message {
                 case .string(let string):
-                    return try jsonDecoder.decode(GatewayDynamicPayload.self, from: Data(string.utf8))
+                    return .init(string.utf8)
                 case .data(let data):
-                    return try jsonDecoder.decode(GatewayDynamicPayload.self, from: data) // TODO: Handle compression.
+                    return data
+                    // TODO: Handle compression.
                 }
             }()
+            let payload = try jsonDecoder.decode(GatewayShallowPayload.self, from: data)
 
             dump(payload)
 
             switch payload.opcode {
             case .hello:
-                let heartbeatInterval = payload.data?.object?["heartbeat_interval"]??.number?.int.flatMap {
-                    TimeInterval($0)
+                let payload = try JSONDecoder.discord.decode(GatewayPayload<Hello>.self, from: data)
+                if let heartbeatInterval = payload.data?.heartbeatInterval {
+                    self.heartbeatInterval = heartbeatInterval
                 }
-
-                self.heartbeatInterval = heartbeatInterval ?? self.heartbeatInterval
                 self.lastHeartbeatACKDate = Date()
 
                 try await identify()
@@ -108,21 +109,18 @@ extension GatewaySession {
             return
         }
 
-        let payload = GatewayDynamicPayload(
-            opcode: .identify,
-            data: .object([
-                "token": .string(authenticationToken),
-                "compress": .bool(false),
-                "properties": .object([
-                    "os": .string(os),
-                    "browser": .string("swift-discord"),
-                    "device": .string("swift-discord")
-                ]),
-                "intents": .number(.int(513))
-            ]),
-            sequence: nil,
-            type: nil
-        )
+        let payload =
+            GatewayPayload(
+                opcode: .identify,
+                data: Identify(
+                    token: authenticationToken,
+                    properties: .init(
+                        os: os,
+                        browser: "swift-discord",
+                        device: "swift-discord"),
+                    intents: 513),
+                sequence: nil,
+                type: nil)
 
         try await send(payload: payload)
     }
