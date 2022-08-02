@@ -5,6 +5,7 @@
 //  Created by Jaehong Kang on 2022/07/22.
 //
 
+import Dispatch
 import Foundation
 import DiscordCore
 import WebSocket
@@ -31,6 +32,35 @@ extension GatewaySession {
     }
 }
 
+extension GatewaySession {
+
+    private func startHeartbeatTimer(interval: TimeInterval) {
+        guard heartbeatTimer == nil
+        else {
+            return
+        }
+        let heartbeatTimer = DispatchSource.makeTimerSource()
+        heartbeatTimer.schedule(wallDeadline: .now() + interval, repeating: interval)
+        heartbeatTimer.setEventHandler {
+            Task {
+                [weak self] in
+                try await self?.heartbeat()
+            }
+        }
+        heartbeatTimer.activate()
+        self.heartbeatTimer = heartbeatTimer
+    }
+
+    private func stopHeartbeatTimer() {
+        if let heartbeatTimer = heartbeatTimer {
+            self.heartbeatTimer = nil
+            if !heartbeatTimer.isCancelled {
+                heartbeatTimer.cancel()
+            }
+        }
+    }
+}
+
 extension GatewaySession: WebSocketSessionDelegate {
     public nonisolated func didReceiveMessage(_ message: WebSocketSession.Message, context: Context) {
         Task {
@@ -51,32 +81,42 @@ extension GatewaySession: WebSocketSessionDelegate {
                 }
             }()
             let payload = try jsonDecoder.decode(GatewayShallowPayload.self, from: data)
-
-            dump(payload)
+            if let sequence = payload.sequence {
+                self.sequence = sequence
+            }
 
             switch payload.opcode {
             case .hello:
                 let payload = try JSONDecoder.discord.decode(GatewayPayload<Hello>.self, from: data)
                 if let heartbeatInterval = payload.data?.heartbeatInterval {
                     self.heartbeatInterval = heartbeatInterval
+                    print("heartbeat interval set to \(heartbeatInterval) secs.")
                 }
-                self.lastHeartbeatACKDate = Date()
-
+                stopHeartbeatTimer()
+                startHeartbeatTimer(interval: heartbeatInterval)
                 try await identify()
             case .heartbeatACK:
-                self.lastHeartbeatACKDate = Date()
+                stopHeartbeatTimer()
+                startHeartbeatTimer(interval: heartbeatInterval)
+                print(payload.opcode)
             default:
                 dump(message)
-            }
-
-            sequence = payload.sequence ?? sequence
-
-            if Date() >= lastHeartbeatACKDate.addingTimeInterval(heartbeatInterval) {
-                try await heartbeat()
             }
         } catch {
             debugPrint(error)
         }
+    }
+
+    public nonisolated func didClose(context: Context) {
+        Task {
+            await _didClose(context: context)
+        }
+    }
+
+    private func _didClose(context: Context) async {
+        stopHeartbeatTimer()
+        heartbeatInterval = .infinity
+        sequence = nil
     }
 }
 
@@ -94,9 +134,9 @@ extension GatewaySession {
     }
 
     func heartbeat() async throws {
-        let payload = GatewayDynamicPayload(
+        let payload = GatewayPayload<Int64>(
             opcode: .heartbeat,
-            data: sequence.flatMap { .number(.int(Int64($0))) },
+            data: sequence.flatMap({.init($0)}),
             sequence: nil,
             type: nil
         )

@@ -6,6 +6,7 @@
 //
 
 import DiscordCore
+import Dispatch
 import Foundation
 import WebSocket
 
@@ -17,10 +18,11 @@ public actor GatewaySession {
 
     var webSocketSession: WebSocketSession?
 
-    var lastHeartbeatACKDate: Date = .distantFuture
     var heartbeatInterval: TimeInterval = .leastNormalMagnitude
 
     var sequence: Int?
+
+    internal var heartbeatTimer: DispatchSourceTimer? = nil
 
     public init(
         apiVersion: DiscordAPIVersion = .latest,
