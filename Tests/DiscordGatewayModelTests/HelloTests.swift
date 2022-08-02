@@ -23,6 +23,6 @@ final class HelloTests: XCTestCase {
             """
             .data(using: .utf8)!
         let hello = try jsonDecoder.decode(Hello.self, from: exampleData)
-        XCTAssertEqual(hello.heartbeatInterval, 45000)
+        XCTAssertEqual(hello.heartbeatInterval, 45)
     }
 }
