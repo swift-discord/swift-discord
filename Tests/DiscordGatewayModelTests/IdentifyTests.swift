@@ -50,6 +50,10 @@ final class IdentifyTests: XCTestCase {
         // TODO: shard
         //XCTAssertEqual(identify.shard, <#T##expression2: Equatable##Equatable#>)
         // skip identify.presence
-        XCTAssertEqual(identify.intents, 7)
+        XCTAssertEqual(
+            identify.intents,
+            [.guilds,
+             .guildMembers,
+             .guildBans])
     }
 }

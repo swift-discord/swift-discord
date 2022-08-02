@@ -158,7 +158,7 @@ extension GatewaySession {
                         os: os,
                         browser: "swift-discord",
                         device: "swift-discord"),
-                    intents: 513),
+                    intents: [.guilds, .guildMessages]),
                 sequence: nil,
                 type: nil)
 

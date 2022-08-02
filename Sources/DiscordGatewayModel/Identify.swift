@@ -20,7 +20,7 @@ public struct Identify: Hashable, Sendable {
 
     public var presence: PresenceUpdate?
 
-    public var intents: Int
+    public var intents: Intents
 
     public init(
         token: String,
@@ -28,7 +28,7 @@ public struct Identify: Hashable, Sendable {
         supportsCompression: Bool? = nil,
         largeThreshold: Int? = nil,
         presence: PresenceUpdate? = nil,
-        intents: Int
+        intents: Intents
     ) {
         self.token = token
         self.properties = properties
