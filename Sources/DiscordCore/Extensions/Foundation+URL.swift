@@ -8,5 +8,5 @@
 import Foundation
 
 extension URL {
-    public static let discordURL: URL = URL(string: "https://discord.com/")!
+    public static let discord: URL = URL(string: "https://discord.com/")!
 }

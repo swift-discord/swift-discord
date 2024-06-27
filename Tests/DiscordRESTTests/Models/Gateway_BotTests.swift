@@ -5,10 +5,9 @@
 //  Created by Mina Her on 2022/07/27.
 //
 
+import XCTest
 import _DiscordTestSupport
-
-@testable
-import DiscordRESTModel
+@testable import DiscordREST
 
 final class Gateway_BotTests: XCTestCase {
 

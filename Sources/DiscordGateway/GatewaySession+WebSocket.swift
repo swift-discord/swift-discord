@@ -8,7 +8,7 @@
 import Dispatch
 import Foundation
 import DiscordCore
-import WebSocket
+import WebSocketClient
 
 extension GatewaySession {
     var os: String {
@@ -71,12 +71,12 @@ extension GatewaySession: WebSocketSessionDelegate {
     func _didReceiveMessage(_ message: WebSocketSession.Message, context: Context) async {
         do {
             let jsonDecoder = JSONDecoder()
-            let data: Data = {
+            let data: Foundation.Data = {
                 switch message {
                 case .string(let string):
                     return .init(string.utf8)
                 case .data(let data):
-                    return data
+                    return .init(data)
                     // TODO: Handle compression.
                 }
             }()

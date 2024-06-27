@@ -1,10 +1,11 @@
 //
 //  TestCase.swift
-//  
+//
 //
 //  Created by Jaehong Kang on 2022/07/20.
 //
 
+import XCTest
 #if canImport(GlibC)
 import GlibC
 #endif
@@ -12,7 +13,7 @@ import Foundation
 #if canImport(FoundationNetworking)
 import FoundationNetworking
 #endif
-import Discord
+import DiscordREST
 
 open class TestCase: XCTestCase {
     open class var oAuth2ClientID: String? {

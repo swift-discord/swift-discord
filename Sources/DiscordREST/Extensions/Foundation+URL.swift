@@ -9,7 +9,7 @@ import Foundation
 import DiscordCore
 
 extension URL {
-    public static let discordAPIBaseURL: URL = URL(string: "api", relativeTo: Self.discordURL)!
+    public static let discordAPIBaseURL: URL = URL(string: "api", relativeTo: .discord)!
 
     public init?(discordAPIPath: String) {
         self.init(

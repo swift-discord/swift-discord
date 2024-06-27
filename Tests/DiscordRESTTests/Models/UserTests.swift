@@ -5,9 +5,10 @@
 //  Created by Jaehong Kang on 2022/07/20.
 //
 
+import XCTest
 import _DiscordTestSupport
 @testable import DiscordCore
-@testable import DiscordRESTModel
+@testable import DiscordREST
 
 final class UserTests: TestCase {
     func testDecoding() throws {

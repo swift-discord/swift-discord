@@ -5,11 +5,10 @@
 //  Created by Jaehong Kang on 2022/07/22.
 //
 
+import XCTest
 import _DiscordTestSupport
 import DiscordREST
-
-@testable
-import DiscordGateway
+@testable import DiscordGateway
 
 final class DiscordGatewayTests: TestCase {
     func testMain() async throws {
