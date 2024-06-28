@@ -11,8 +11,7 @@ import Foundation
 import WebSocketClient
 
 public actor GatewaySession {
-
-    public let apiVersion: DiscordAPIVersion
+    public let apiVersion: DiscordAPIVersion?
     public let encoding: Encoding
     public let authenticationToken: String?
 
@@ -25,7 +24,7 @@ public actor GatewaySession {
     internal var heartbeatTimer: DispatchSourceTimer? = nil
 
     public init(
-        apiVersion: DiscordAPIVersion = .latest,
+        apiVersion: DiscordAPIVersion? = nil,
         encoding: Encoding = .json,
         authenticationToken: String
     ) {
@@ -42,10 +41,15 @@ extension GatewaySession {
         if urlComponents.path.isEmpty {
             urlComponents.path = "/"
         }
-        urlComponents.queryItems = [
-            .init(name: "v", value: apiVersion.versionString),
+
+        var queryItems: [URLQueryItem] = [
             .init(name: "encoding", value: encoding.rawValue),
         ]
+        if let apiVersion {
+            queryItems.append(.init(name: "v", value: apiVersion.versionString))
+        }
+        urlComponents.queryItems = queryItems
+
         let webSocketSession = WebSocketSession(url: urlComponents.url!, configuration: .init(), delegate: self)
         self.webSocketSession = webSocketSession
         try await webSocketSession.connect()
