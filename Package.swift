@@ -27,6 +27,22 @@ let package = Package(
     targets: [
         // Targets are the basic building blocks of a package, defining a module or a test suite.
         // Targets can depend on other targets in this package and products from dependencies.
+        .systemLibrary(
+            name: "Clibavformat",
+            pkgConfig: "libavformat",
+            providers: [
+                .brew(["ffmpeg"]),
+                .apt(["libav-dev"])
+            ]
+        ),
+        .systemLibrary(
+            name: "Clibavcodec",
+            pkgConfig: "Clibavcodec",
+            providers: [
+                .brew(["ffmpeg"]),
+                .apt(["libavcodec-dev"])
+            ]
+        ),
         .target(
             name: "Discord",
             dependencies: ["DiscordREST", "DiscordGateway"]),
@@ -44,6 +60,15 @@ let package = Package(
                 .product(name: "WebSocketClient", package: "swift-websocket-client"),
                 "DiscordCore",
                 "DiscordREST",
+            ]),
+        .target(
+            name: "DiscordVoice",
+            dependencies: [
+                .product(name: "WebSocketClient", package: "swift-websocket-client"),
+                "DiscordCore",
+                "DiscordREST",
+                "Clibavformat",
+                "Clibavcodec",
             ]),
         .target(
             name: "_DiscordTestSupport",
