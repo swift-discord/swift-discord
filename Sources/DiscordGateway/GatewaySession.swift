@@ -5,15 +5,16 @@
 //  Created by Jaehong Kang on 2022/07/21.
 //
 
-import DiscordCore
-import Dispatch
 import Foundation
+import Dispatch
+import DiscordCore
+import DiscordREST
 import WebSocketClient
 
 public actor GatewaySession {
     public let apiVersion: DiscordAPIVersion?
     public let encoding: Encoding
-    public let authenticationToken: String?
+    public let restSession: RESTSession
 
     var webSocketSession: WebSocketSession?
 
@@ -26,16 +27,15 @@ public actor GatewaySession {
     public init(
         apiVersion: DiscordAPIVersion? = nil,
         encoding: Encoding = .json,
-        authenticationToken: String
+        restSession: RESTSession
     ) {
         self.apiVersion = apiVersion
         self.encoding = encoding
-        self.authenticationToken = authenticationToken
+        self.restSession = restSession
     }
 }
 
 extension GatewaySession {
-
     public func connect(url: URL) async throws {
         var urlComponents = URLComponents(url: url, resolvingAgainstBaseURL: true)!
         if urlComponents.path.isEmpty {
@@ -53,6 +53,11 @@ extension GatewaySession {
         let webSocketSession = WebSocketSession(url: urlComponents.url!, configuration: .init(), delegate: self)
         self.webSocketSession = webSocketSession
         try await webSocketSession.connect()
+    }
+
+    public func connect() async throws {
+        let gateway = try await Gateway(session: self.restSession)
+        try await self.connect(url: gateway.url)
     }
 
     public func disconnect() throws {

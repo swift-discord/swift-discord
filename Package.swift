@@ -42,7 +42,8 @@ let package = Package(
             name: "DiscordGateway",
             dependencies: [
                 .product(name: "WebSocketClient", package: "swift-websocket-client"),
-                "DiscordCore"
+                "DiscordCore",
+                "DiscordREST",
             ]),
         .target(
             name: "_DiscordTestSupport",

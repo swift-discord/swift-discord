@@ -145,7 +145,7 @@ extension GatewaySession {
     }
 
     func identify() async throws {
-        guard let authenticationToken = authenticationToken else {
+        guard let authenticationToken = await restSession.oAuth2Credential?.accessToken else {
             return
         }
 
