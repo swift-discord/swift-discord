@@ -5,6 +5,8 @@
 //  Created by Mina Her on 2022/07/30.
 //
 
+import DiscordCore
+
 public struct Team: Hashable, Identifiable, Sendable {
 
     public var icon: String?

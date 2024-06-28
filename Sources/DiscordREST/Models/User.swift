@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import DiscordCore
 
 public struct User: Equatable, Hashable, Identifiable, Sendable, Codable {
     public enum PremiumType: Int, Equatable, Hashable, Sendable, Codable {

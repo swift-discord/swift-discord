@@ -7,6 +7,7 @@
 
 import struct Foundation.Date
 import struct Foundation.URL
+import DiscordCore
 
 public struct Activity: Hashable, Sendable {
 

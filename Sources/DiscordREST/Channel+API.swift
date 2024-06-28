@@ -9,6 +9,7 @@ import Foundation
 #if canImport(FoundationNetworking)
 import FoundationNetworking
 #endif
+import DiscordCore
 
 extension Channel {
     public init(channelID: Snowflake, session: RESTSession) async throws {

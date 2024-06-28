@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import DiscordCore
 
 // TODO: Implement Properties
 public struct Emoji: Equatable, Hashable, Sendable, Codable {

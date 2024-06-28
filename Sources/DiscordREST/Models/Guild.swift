@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import DiscordCore
 
 public struct Guild: Equatable, Hashable, Identifiable, Sendable {
     public enum VerificationLevel: Int, Equatable, Hashable, Sendable, Codable {

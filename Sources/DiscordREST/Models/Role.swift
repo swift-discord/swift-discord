@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import DiscordCore
 
 public struct Role: Equatable, Hashable, Identifiable, Sendable {
     public struct Tags: Equatable, Hashable, Sendable {

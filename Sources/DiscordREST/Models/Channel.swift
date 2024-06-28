@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import DiscordCore
 
 public struct Channel: Equatable, Hashable, Identifiable, Sendable {
     public enum `Type`: Int, Equatable, Hashable, Sendable, Codable {

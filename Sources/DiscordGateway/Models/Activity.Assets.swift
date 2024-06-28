@@ -5,6 +5,8 @@
 //  Created by Mina Her on 2022/08/01.
 //
 
+import DiscordCore
+
 extension Activity {
 
     public struct Assets: Hashable, Sendable {

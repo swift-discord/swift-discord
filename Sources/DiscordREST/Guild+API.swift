@@ -9,6 +9,7 @@ import Foundation
 #if canImport(FoundationNetworking)
 import FoundationNetworking
 #endif
+import DiscordCore
 
 extension Guild {
     public static func myGuilds(session: RESTSession) async throws -> [Guild] {

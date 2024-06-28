@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import DiscordCore
 
 extension Guild {
     public struct WelcomeScreen: Equatable, Hashable, Sendable, Codable {

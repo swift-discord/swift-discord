@@ -9,6 +9,7 @@ import Foundation
 #if canImport(FoundationNetworking)
 import FoundationNetworking
 #endif
+import DiscordCore
 
 extension User {
     public static func me(session: RESTSession) async throws -> User {
