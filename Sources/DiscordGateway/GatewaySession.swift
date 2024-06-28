@@ -6,23 +6,16 @@
 //
 
 import Foundation
-import Dispatch
 import DiscordCore
 import DiscordREST
 import WebSocketClient
 
-public actor GatewaySession {
+public final class GatewaySession: Sendable {
     public let apiVersion: DiscordAPIVersion?
     public let encoding: Encoding
     public let restSession: RESTSession
 
-    var webSocketSession: WebSocketSession?
-
-    var heartbeatInterval: TimeInterval = .leastNormalMagnitude
-
-    var sequence: Int?
-
-    internal var heartbeatTimer: DispatchSourceTimer? = nil
+    let actor = Actor()
 
     public init(
         apiVersion: DiscordAPIVersion? = nil,
@@ -51,7 +44,9 @@ extension GatewaySession {
         urlComponents.queryItems = queryItems
 
         let webSocketSession = WebSocketSession(url: urlComponents.url!, configuration: .init(), delegate: self)
-        self.webSocketSession = webSocketSession
+        await self.actor.run {
+            $0.webSocketSession = webSocketSession
+        }
         try await webSocketSession.connect()
     }
 
@@ -66,9 +61,7 @@ extension GatewaySession {
 }
 
 extension GatewaySession {
-
-    public enum Encoding: String {
-
+    public enum Encoding: String, Sendable {
         case json
     }
 }

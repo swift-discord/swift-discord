@@ -32,97 +32,64 @@ extension GatewaySession {
     }
 }
 
-extension GatewaySession {
-
-    private func startHeartbeatTimer(interval: TimeInterval) {
-        guard heartbeatTimer == nil
-        else {
-            return
-        }
-        let heartbeatTimer = DispatchSource.makeTimerSource()
-        heartbeatTimer.schedule(wallDeadline: .now() + interval, repeating: interval)
-        heartbeatTimer.setEventHandler {
-            Task {
-                [weak self] in
-                try await self?.heartbeat()
-            }
-        }
-        heartbeatTimer.activate()
-        self.heartbeatTimer = heartbeatTimer
-    }
-
-    private func stopHeartbeatTimer() {
-        if let heartbeatTimer = heartbeatTimer {
-            self.heartbeatTimer = nil
-            if !heartbeatTimer.isCancelled {
-                heartbeatTimer.cancel()
-            }
-        }
-    }
-}
-
 extension GatewaySession: WebSocketSessionDelegate {
-    public nonisolated func didReceiveMessage(_ message: WebSocketSession.Message, context: Context) {
+    public func didReceiveMessage(_ message: WebSocketSession.Message, context: Context) {
         Task {
-            await _didReceiveMessage(message, context: context)
+            do {
+                let jsonDecoder = JSONDecoder()
+                let data: Foundation.Data = {
+                    switch message {
+                    case .string(let string):
+                        return .init(string.utf8)
+                    case .data(let data):
+                        return .init(data)
+                        // TODO: Handle compression.
+                    }
+                }()
+                let payload = try jsonDecoder.decode(GatewayShallowPayload.self, from: data)
+                if let sequence = payload.sequence {
+                    await self.actor.updateSequence(sequence)
+                }
+
+                switch payload.opcode {
+                case .hello:
+                    let payload = try JSONDecoder.discord.decode(GatewayPayload<Hello>.self, from: data)
+                    if let heartbeatInterval = payload.data?.heartbeatInterval {
+                        await self.actor.run {
+                            $0.heartbeatInterval = heartbeatInterval
+                        }
+                        print("heartbeat interval set to \(heartbeatInterval) secs.")
+                    }
+                    await self.actor.stopHeartbeatTimer()
+                    await self.actor.startHeartbeatTimer(interval: self.actor.heartbeatInterval, session: self)
+                    try await identify()
+                case .heartbeatACK:
+                    await self.actor.stopHeartbeatTimer()
+                    await self.actor.startHeartbeatTimer(interval: self.actor.heartbeatInterval, session: self)
+                    print(payload.opcode)
+                default:
+                    dump(message)
+                }
+            } catch {
+                debugPrint(error)
+            }
         }
     }
 
-    func _didReceiveMessage(_ message: WebSocketSession.Message, context: Context) async {
-        do {
-            let jsonDecoder = JSONDecoder()
-            let data: Foundation.Data = {
-                switch message {
-                case .string(let string):
-                    return .init(string.utf8)
-                case .data(let data):
-                    return .init(data)
-                    // TODO: Handle compression.
-                }
-            }()
-            let payload = try jsonDecoder.decode(GatewayShallowPayload.self, from: data)
-            if let sequence = payload.sequence {
-                self.sequence = sequence
-            }
-
-            switch payload.opcode {
-            case .hello:
-                let payload = try JSONDecoder.discord.decode(GatewayPayload<Hello>.self, from: data)
-                if let heartbeatInterval = payload.data?.heartbeatInterval {
-                    self.heartbeatInterval = heartbeatInterval
-                    print("heartbeat interval set to \(heartbeatInterval) secs.")
-                }
-                stopHeartbeatTimer()
-                startHeartbeatTimer(interval: heartbeatInterval)
-                try await identify()
-            case .heartbeatACK:
-                stopHeartbeatTimer()
-                startHeartbeatTimer(interval: heartbeatInterval)
-                print(payload.opcode)
-            default:
-                dump(message)
-            }
-        } catch {
-            debugPrint(error)
-        }
-    }
-
-    public nonisolated func didClose(context: Context) {
+    public func didClose(context: Context) {
         Task {
-            await _didClose(context: context)
+            await self.actor.run {
+                $0.stopHeartbeatTimer()
+                $0.heartbeatInterval = .infinity
+                $0.sequence = nil
+            }
         }
-    }
-
-    private func _didClose(context: Context) async {
-        stopHeartbeatTimer()
-        heartbeatInterval = .infinity
-        sequence = nil
     }
 }
 
 extension GatewaySession {
     func send<D>(payload: GatewayPayload<D>) async throws where D: Encodable {
-        guard let webSocketSession = webSocketSession else {
+        guard let webSocketSession = await actor.webSocketSession else {
             return
         }
 
@@ -134,9 +101,9 @@ extension GatewaySession {
     }
 
     func heartbeat() async throws {
-        let payload = GatewayPayload<Int64>(
+        let payload = await GatewayPayload<Int64>(
             opcode: .heartbeat,
-            data: sequence.flatMap({.init($0)}),
+            data: actor.sequence.flatMap({.init($0)}),
             sequence: nil,
             type: nil
         )
