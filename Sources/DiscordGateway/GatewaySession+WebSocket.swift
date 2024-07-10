@@ -10,28 +10,6 @@ import Foundation
 import DiscordCore
 import WebSocketClient
 
-extension GatewaySession {
-    var os: String {
-        #if os(iOS)
-        return "iOS"
-        #elseif os(macOS)
-        return "macOS"
-        #elseif os(watchOS)
-        return "watchOS"
-        #elseif os(tvOS)
-        return "tvOS"
-        #elseif os(Linux)
-        return "Linux"
-        #elseif os(Windows)
-        return "Windows"
-        #elseif os(Android)
-        return "Android"
-        #else
-        return "Unknown"
-        #endif
-    }
-}
-
 extension GatewaySession: WebSocketSessionDelegate {
     public func didReceiveMessage(_ message: WebSocketSession.Message, context: Context) {
         Task {
@@ -110,9 +88,9 @@ extension GatewaySession {
                 data: Identify(
                     token: authenticationToken,
                     properties: .init(
-                        os: os,
-                        browser: "swift-discord",
-                        device: "swift-discord"),
+                        os: configuration.osInfo,
+                        browser: configuration.browserInfo,
+                        device: configuration.deviceInfo),
                     intents: [.guilds, .guildMessages]),
                 sequence: nil,
                 type: nil)
