@@ -58,6 +58,23 @@ extension GatewaySession {
     public func disconnect() throws {
         // TODO: Implement
     }
+
+    public func send<D>(payload: GatewayPayload<D>) async throws where D: Encodable {
+        guard let webSocketSession = await actor.webSocketSession else {
+            return
+        }
+
+        let encoder: any TopLevelEncoder<Foundation.Data> = {
+            switch configuration.encoding {
+            case .json:
+                JSONEncoder.discord
+            }
+        }()
+
+        let data = try encoder.encode(payload)
+
+        try await webSocketSession.send(.string(String(decoding: data, as: UTF8.self)))
+    }
 }
 
 extension GatewaySession {

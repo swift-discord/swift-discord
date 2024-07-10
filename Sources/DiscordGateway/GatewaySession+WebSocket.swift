@@ -88,18 +88,6 @@ extension GatewaySession: WebSocketSessionDelegate {
 }
 
 extension GatewaySession {
-    func send<D>(payload: GatewayPayload<D>) async throws where D: Encodable {
-        guard let webSocketSession = await actor.webSocketSession else {
-            return
-        }
-
-        let jsonEncoder = JSONEncoder.discord
-
-        let data = try jsonEncoder.encode(payload)
-
-        try await webSocketSession.send(.string(String(decoding: data, as: UTF8.self)))
-    }
-
     func heartbeat() async throws {
         let payload = await GatewayPayload<Int64>(
             opcode: .heartbeat,
