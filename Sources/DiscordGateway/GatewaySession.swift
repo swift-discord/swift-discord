@@ -55,7 +55,7 @@ extension GatewaySession {
         try await self.connect(url: gateway.url)
     }
 
-    public func disconnect() throws {
+    public func disconnect() {
         // TODO: Implement
     }
 
