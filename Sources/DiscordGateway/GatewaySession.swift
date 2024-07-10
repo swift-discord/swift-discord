@@ -11,19 +11,16 @@ import DiscordREST
 import WebSocketClient
 
 public final class GatewaySession: Sendable {
-    public let apiVersion: DiscordAPIVersion?
-    public let encoding: Encoding
+    public let configuration: Configuration
     public let restSession: RESTSession
 
     let actor = Actor()
 
     public init(
-        apiVersion: DiscordAPIVersion? = nil,
-        encoding: Encoding = .json,
+        configuration: Configuration,
         restSession: RESTSession
     ) {
-        self.apiVersion = apiVersion
-        self.encoding = encoding
+        self.configuration = configuration
         self.restSession = restSession
     }
 }
@@ -36,9 +33,9 @@ extension GatewaySession {
         }
 
         var queryItems: [URLQueryItem] = [
-            .init(name: "encoding", value: encoding.rawValue),
+            .init(name: "encoding", value: configuration.encoding.rawValue),
         ]
-        if let apiVersion {
+        if let apiVersion = configuration.apiVersion {
             queryItems.append(.init(name: "v", value: apiVersion.versionString))
         }
         urlComponents.queryItems = queryItems
