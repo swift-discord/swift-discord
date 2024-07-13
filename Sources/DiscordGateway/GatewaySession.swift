@@ -6,35 +6,98 @@
 //
 
 import Foundation
-import WebSocket
+import DiscordCore
+import DiscordREST
+import WebSocketClient
 
-public actor GatewaySession {
-    public let authenticationToken: String?
+public final class GatewaySession: Sendable {
+    public typealias EventHandler = @Sendable (any GatewayPayloadable) async -> Void
 
-    var webSocketSession: WebSocketSession?
+    public let configuration: Configuration
+    public let restSession: RESTSession
+    public let eventHandler: EventHandler
 
-    var lastHeartbeatACKDate: Date = .distantFuture
-    var heartbeatInterval: TimeInterval = .leastNormalMagnitude
+    let actor = Actor()
 
-    var sequence: Int?
-
-    public init(authenticationToken: String) {
-        self.authenticationToken = authenticationToken
+    public init(
+        configuration: Configuration,
+        restSession: RESTSession,
+        eventHandler: @escaping EventHandler
+    ) {
+        self.configuration = configuration
+        self.restSession = restSession
+        self.eventHandler = eventHandler
     }
 }
 
 extension GatewaySession {
-    private static var gatewayURL: URL {
-        URL(string: "wss://gateway.discord.gg/?v=10&encoding=json")!
+    public enum Encoding: String, Sendable {
+        case json
     }
+}
 
+extension GatewaySession {
     public func connect() async throws {
-        let webSocketSession = WebSocketSession(url: Self.gatewayURL, configuration: .init(), delegate: self)
-        self.webSocketSession = webSocketSession
-        try await webSocketSession.connect()
+        let gateway = try await Gateway(session: self.restSession)
+        await self.connect(to: gateway.url)
     }
 
-    public func disconnect() throws {
-        // TODO: Implement
+    public func connect(to gatewayURL: URL) async {
+        var urlComponents = URLComponents(url: gatewayURL, resolvingAgainstBaseURL: true)!
+        if urlComponents.path.isEmpty {
+            urlComponents.path = "/"
+        }
+
+        var queryItems: [URLQueryItem] = [
+            .init(name: "encoding", value: configuration.encoding.rawValue),
+        ]
+        if let apiVersion = configuration.apiVersion {
+            queryItems.append(.init(name: "v", value: apiVersion.versionString))
+        }
+        urlComponents.queryItems = queryItems
+
+        let webSocketURL = urlComponents.url!
+        let webSocket = WebSocketClient(url: webSocketURL, configuration: .init(maxFrameSize: 1 << 20))
+
+        await actor.run { actor in
+            actor.webSocketTask = Task.detached { [unowned self] in
+                await webSocketTaskMain(webSocket)
+            }
+
+            while actor.webSocketTask != nil && actor.state != .connected {
+                await Task.yield()
+            }
+        }
+    }
+
+    public func run() async throws {
+        try await connect()
+        try await actor.webSocketTask?.value
+    }
+
+    private func webSocketTaskMain(_ webSocket: WebSocketClient) async {
+        do {
+            await actor.updateState(.connecting)
+            try await webSocket.connect { inbound, outbound in
+                await actor.run { actor in
+                    actor.outbound = outbound
+                    actor.state = .connected
+                }
+
+                for try await webSocketResponse in inbound {
+                    debugPrint(webSocketResponse)
+                    await handleWebSocketResponse(webSocketResponse)
+                }
+
+                await actor.run { actor in
+                    actor.outbound = nil
+                    actor.state = .disconnected
+                }
+            }
+
+            await actor.reset()
+        } catch {
+            debugPrint(error)
+        }
     }
 }

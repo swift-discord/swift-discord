@@ -9,22 +9,21 @@ import Foundation
 import DiscordCore
 
 extension URL {
-    public static let discordAPIBaseURL: URL = URL(string: "api", relativeTo: Self.discordURL)!
+    public static func discordAPIBaseURL(for apiVersion: DiscordAPIVersion? = nil) -> URL {
+        let discordAPIBaseURL = URL(string: "api/", relativeTo: .discord)!
 
-    public init?(discordAPIPath: String) {
-        self.init(
-            string: discordAPIPath,
-            relativeTo: Self.discordAPIBaseURL
-                .deletingLastPathComponent()
-                .appendingPathComponent(Self.discordAPIBaseURL.lastPathComponent, isDirectory: true)
-        )
+        if let apiVersion {
+            return discordAPIBaseURL
+                .appendingPathComponent("v\(apiVersion.versionString)", isDirectory: true)
+        } else {
+            return discordAPIBaseURL
+        }
     }
 
-    public init?(discordAPIPath: String, apiVersion: DiscordAPIVersion) {
+    public init?(discordAPIPath: String, apiVersion: DiscordAPIVersion? = nil) {
         self.init(
             string: discordAPIPath,
-            relativeTo: Self.discordAPIBaseURL
-                .appendingPathComponent("v\(apiVersion.versionString)", isDirectory: true)
+            relativeTo: .discordAPIBaseURL(for: apiVersion)
         )
     }
 }

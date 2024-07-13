@@ -5,8 +5,6 @@
 //  Created by Jaehong Kang on 2022/07/21.
 //
 
-import Foundation
-
 public enum Unknown<T> where T: RawRepresentable {
     case value(T)
     case rawValue(T.RawValue)

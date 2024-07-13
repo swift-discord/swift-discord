@@ -1,0 +1,6 @@
+
+module Clibavcodec [system] {
+  header "avcodec.h"
+  link "avcodec"
+  export *
+}

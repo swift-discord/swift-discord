@@ -5,125 +5,141 @@
 //  Created by Jaehong Kang on 2022/07/22.
 //
 
+import Dispatch
 import Foundation
 import DiscordCore
-import WebSocket
+import WebSocketClient
 
 extension GatewaySession {
-    var os: String {
-        #if os(iOS)
-        return "iOS"
-        #elseif os(macOS)
-        return "macOS"
-        #elseif os(watchOS)
-        return "watchOS"
-        #elseif os(tvOS)
-        return "tvOS"
-        #elseif os(Linux)
-        return "Linux"
-        #elseif os(Windows)
-        return "Windows"
-        #elseif os(Android)
-        return "Android"
-        #else
-        return "Unknown"
-        #endif
-    }
-}
-
-extension GatewaySession: WebSocketSessionDelegate {
-    public nonisolated func didReceiveMessage(_ message: WebSocketSession.Message, context: Context) {
-        Task {
-            await _didReceiveMessage(message, context: context)
-        }
-    }
-
-    func _didReceiveMessage(_ message: WebSocketSession.Message, context: Context) async {
+    func handleWebSocketResponse(_ webSocketResponse: WebSocketClient.Response) async {
         do {
-            let jsonDecoder = JSONDecoder()
-            let payload: GatewayDynamicPayload = try {
-                switch message {
-                case .string(let string):
-                    return try jsonDecoder.decode(GatewayDynamicPayload.self, from: Data(string.utf8))
-                case .data(let data):
-                    return try jsonDecoder.decode(GatewayDynamicPayload.self, from: data) // TODO: Handle compression.
-                }
-            }()
+            let data: Data
+            switch webSocketResponse.data {
+            case .ping(let string):
+                data = Data(string.utf8)
+            case .text(let string):
+                data = Data(string.utf8)
+            case .binary(let buffer):
+                data = Data(buffer)
+            case .close:
+                return
+            case nil:
+                dump(webSocketResponse.frame)
+                return
+            }
 
-            dump(payload)
+            let payload = try JSONDecoder.discord.decode(GatewayShallowPayload.self, from: data)
+            if let sequence = payload.sequence {
+                await self.actor.updateSequence(sequence)
+            }
 
             switch payload.opcode {
             case .hello:
-                let heartbeatInterval = payload.data?.object?["heartbeat_interval"]??.number?.int.flatMap {
-                    TimeInterval($0)
+                let payload = try JSONDecoder.discord.decode(GatewayPayload<Hello>.self, from: data)
+                if let heartbeatInterval = payload.data?.heartbeatInterval {
+                    await self.actor.run {
+                        $0.heartbeatInterval = heartbeatInterval
+                    }
+                    print("heartbeat interval set to \(heartbeatInterval) secs.")
                 }
-
-                self.heartbeatInterval = heartbeatInterval ?? self.heartbeatInterval
-                self.lastHeartbeatACKDate = Date()
-
+                await self.actor.stopHeartbeatTimer()
+                await self.actor.startHeartbeatTimer(interval: self.actor.heartbeatInterval, session: self)
                 try await identify()
             case .heartbeatACK:
-                self.lastHeartbeatACKDate = Date()
+                await self.actor.stopHeartbeatTimer()
+                await self.actor.startHeartbeatTimer(interval: self.actor.heartbeatInterval, session: self)
+                print(payload.opcode)
+            case .dispatch:
+                await self.actor.run { actor in
+                    actor.state = .ready
+                }
             default:
-                dump(message)
-            }
-
-            sequence = payload.sequence ?? sequence
-
-            if Date() >= lastHeartbeatACKDate.addingTimeInterval(heartbeatInterval) {
-                try await heartbeat()
+                dump(webSocketResponse.data)
             }
         } catch {
             debugPrint(error)
         }
     }
+
 }
 
 extension GatewaySession {
-    func send<D>(payload: GatewayPayload<D>) async throws where D: Encodable {
-        guard let webSocketSession = webSocketSession else {
-            return
+    public func send<D>(payload: GatewayPayload<D>, waitsForReady: Bool = true) async throws where D: Encodable {
+        let encoder: any TopLevelEncoder<Foundation.Data> = {
+            switch configuration.encoding {
+            case .json:
+                JSONEncoder.discord
+            }
+        }()
+
+        let data = try encoder.encode(payload)
+
+        let outbound = await actor.run { actor in
+            if waitsForReady {
+                while actor.webSocketTask != nil && actor.state != .ready {
+                    await Task.yield()
+                }
+            } else {
+                while actor.webSocketTask != nil && actor.state == .connecting {
+                    await Task.yield()
+                }
+            }
+
+            return actor.outbound
         }
 
-        let jsonEncoder = JSONEncoder.discord
-
-        let data = try jsonEncoder.encode(payload)
-
-        try await webSocketSession.send(.string(String(decoding: data, as: UTF8.self)))
+        try await outbound?.write(.text(String(decoding: data, as: UTF8.self)))
     }
+}
 
+extension GatewaySession {
+    public func updatePresence(idleSince: Date? = nil, activities: [Activity], status: PresenceUpdate.Status, afk: Bool) async throws {
+        let payload =
+            GatewayPayload(
+                opcode: .presenceUpdate,
+                data: PresenceUpdate(
+                    sinceDate: idleSince,
+                    activities: activities,
+                    status: status,
+                    afk: afk
+                ),
+                sequence: nil,
+                type: nil)
+
+        try await send(payload: payload)
+    }
+}
+
+extension GatewaySession {
     func heartbeat() async throws {
-        let payload = GatewayDynamicPayload(
+        let payload = await GatewayPayload<Int64>(
             opcode: .heartbeat,
-            data: sequence.flatMap { .number(.int(Int64($0))) },
+            data: actor.sequence.flatMap({.init($0)}),
             sequence: nil,
             type: nil
         )
 
-        try await send(payload: payload)
+        try await send(payload: payload, waitsForReady: false)
     }
 
     func identify() async throws {
-        guard let authenticationToken = authenticationToken else {
+        guard let authenticationToken = await restSession.oAuth2Credential?.accessToken else {
             return
         }
 
-        let payload = GatewayDynamicPayload(
-            opcode: .identify,
-            data: .object([
-                "token": .string(authenticationToken),
-                "compress": .bool(false),
-                "properties": .object([
-                    "os": .string(os),
-                    "browser": .string("swift-discord"),
-                    "device": .string("swift-discord")
-                ]),
-                "intents": .number(.int(513))
-            ]),
-            sequence: nil,
-            type: nil
-        )
+        let payload =
+            GatewayPayload(
+                opcode: .identify,
+                data: Identify(
+                    token: authenticationToken,
+                    properties: .init(
+                        os: configuration.osInfo,
+                        browser: configuration.browserInfo,
+                        device: configuration.deviceInfo),
+                    intents: [.guilds, .guildMessages]),
+                sequence: nil,
+                type: nil)
 
-        try await send(payload: payload)
+        try await send(payload: payload, waitsForReady: false)
     }
 }

@@ -9,6 +9,7 @@ import Foundation
 #if canImport(FoundationNetworking)
 import FoundationNetworking
 #endif
+import DiscordCore
 
 extension User {
     public static func me(session: RESTSession) async throws -> User {
@@ -17,9 +18,7 @@ extension User {
 
         let (data, _) = try await session.data(for: urlRequest, includesOAuth2Credential: true)
 
-        let user = try JSONDecoder.discord.decode(User.self, from: data)
-
-        return user
+        return try JSONDecoder.discord.decode(User.self, from: data)
     }
 }
 

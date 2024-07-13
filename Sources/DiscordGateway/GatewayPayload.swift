@@ -7,7 +7,16 @@
 
 import DiscordCore
 
-public struct GatewayPayload<Data> {
+public protocol GatewayPayloadable<Data>  {
+    associatedtype Data
+
+    var opcode: GatewayOpcode { get }
+    var data: Data? { get }
+    var sequence: Int? { get }
+    var type: String? { get }
+}
+
+public struct GatewayPayload<Data>: GatewayPayloadable {
     public let opcode: GatewayOpcode
     public let data: Data?
     public let sequence: Int?

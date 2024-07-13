@@ -9,6 +9,7 @@ import Foundation
 #if canImport(FoundationNetworking)
 import FoundationNetworking
 #endif
+import DiscordCore
 
 extension Guild {
     public static func myGuilds(session: RESTSession) async throws -> [Guild] {
@@ -17,9 +18,7 @@ extension Guild {
 
         let (data, _) = try await session.data(for: urlRequest, includesOAuth2Credential: true)
 
-        let guilds = try JSONDecoder.discord.decode([Guild].self, from: data)
-
-        return guilds
+        return try JSONDecoder.discord.decode([Guild].self, from: data)
     }
 }
 

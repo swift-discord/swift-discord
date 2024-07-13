@@ -17,3 +17,5 @@ extension JSONEncoder {
         return jsonEncoder
     }
 }
+
+extension JSONEncoder: TopLevelEncoder { }

@@ -9,6 +9,7 @@ import Foundation
 #if canImport(FoundationNetworking)
 import FoundationNetworking
 #endif
+import DiscordCore
 
 extension Channel {
     public init(channelID: Snowflake, session: RESTSession) async throws {
@@ -28,8 +29,6 @@ extension Channel {
 
         let (data, _) = try await session.data(for: urlRequest, includesOAuth2Credential: true)
 
-        let channels = try JSONDecoder.discord.decode([Channel].self, from: data)
-
-        return channels
+        return try JSONDecoder.discord.decode([Channel].self, from: data)
     }
 }

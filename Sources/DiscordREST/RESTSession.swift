@@ -56,7 +56,18 @@ extension RESTSession {
         #else
         let (data, response) = try await urlSession._data(for: request)
         #endif
-
+        switch (response as? HTTPURLResponse)?.statusCode ?? .zero {
+        case 429:  // TOO MANY REQUESTS
+            if let error = try? JSONDecoder.discord.decode(RateLimitError.self, from: data) {
+                throw error
+            }
+        case 400 ..< 600:
+            if let error = try? JSONDecoder.discord.decode(RESTError.self, from: data) {
+                throw error
+            }
+        default:
+            break
+        }
         return (data, response)
     }
 }

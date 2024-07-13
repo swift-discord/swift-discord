@@ -36,18 +36,23 @@ jobs:
         id: cache
         with:
           path: .build
-          key: ${{ matrix.operating-system }}-swift-${{ env.SWIFT_VERSION }}-${{ hashFiles('**/Package.resolved') }}
+          key: ${{ runner.os }}-swift-${{ env.SWIFT_VERSION }}-${{ hashFiles('**/Package.resolved') }}
           restore-keys: |
-            ${{ matrix.operating-system }}-swift-${{ env.SWIFT_VERSION }}-
-            ${{ matrix.operating-system }}-swift-
+            ${{ runner.os }}-swift-${{ env.SWIFT_VERSION }}-
+            ${{ runner.os }}-swift-
       - name: Resolve Package Dependencies
         run: swift package resolve
       - name: Build
-        run: swift build --disable-automatic-resolution --build-tests
+        uses: sinoru/actions-swift@v1
+        with:
+          swift-image-tag: null
+          args: build --disable-automatic-resolution --build-tests
         env:
           SWIFT_VERSION: ${{ matrix.swift-version }}
       - name: Run tests
-        run: swift test --disable-automatic-resolution --skip-build
+        uses: sinoru/actions-swift@v1
+        with:
+          args: test --disable-automatic-resolution --skip-build
         env:
           SWIFT_VERSION: ${{ matrix.swift-version }}
   xcode-test:

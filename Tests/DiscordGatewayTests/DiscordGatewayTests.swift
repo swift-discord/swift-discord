@@ -5,8 +5,9 @@
 //  Created by Jaehong Kang on 2022/07/22.
 //
 
+import XCTest
 import _DiscordTestSupport
-@testable import Discord
+import DiscordREST
 @testable import DiscordGateway
 
 final class DiscordGatewayTests: TestCase {
@@ -14,9 +15,10 @@ final class DiscordGatewayTests: TestCase {
         guard let authenticationToken = Self.oAuth2Credential?.accessToken else {
             throw XCTSkip("oAuth2Credential not available.")
         }
-
+        let gateway = try await Gateway(session: Self.session)
         let gatewaySession = GatewaySession(authenticationToken: authenticationToken)
-        try await gatewaySession.connect()
+        print(gateway)
+        try await gatewaySession.connect(url: gateway.url)
 
         withExtendedLifetime(gatewaySession) {
             let expectation = XCTestExpectation()
