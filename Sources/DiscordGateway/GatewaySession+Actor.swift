@@ -11,11 +11,29 @@ import WebSocketClient
 
 extension GatewaySession {
     actor Actor {
-        var webSocketSession: WebSocketSession? = nil
+        var state: State = .disconnected
+        var webSocketTask: Task<Void, Error>?
         var heartbeatInterval: TimeInterval = .leastNormalMagnitude
         var sequence: Int? = nil
         var heartbeatTimer: DispatchSourceTimer? = nil
+        var outbound: WebSocketClient.Outbound? = nil
 
+        deinit {
+            webSocketTask?.cancel()
+        }
+    }
+}
+
+extension GatewaySession.Actor {
+    func updateState(_ state: GatewaySession.State) {
+        self.state = state
+    }
+
+    func reset() {
+        self.stopHeartbeatTimer()
+        self.heartbeatInterval = .infinity
+        self.sequence = nil
+        self.webSocketTask = nil
     }
 }
 

@@ -6,10 +6,10 @@ import PackageDescription
 let package = Package(
     name: "swift-discord",
     platforms: [
-        .macOS(.v10_15),
-        .iOS(.v13),
-        .tvOS(.v13),
-        .watchOS(.v6),
+        .macOS(.v13),
+        .iOS(.v16),
+        .tvOS(.v16),
+        .watchOS(.v9),
     ],
     products: [
         // Products define the executables and libraries a package produces, making them visible to other packages.
@@ -21,7 +21,7 @@ let package = Package(
             targets: ["DiscordREST"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/sinoru/swift-websocket-client.git", from: "0.0.1"),
+        .package(url: "https://github.com/sinoru/swift-websocket-client.git", from: "0.1.0"),
         .package(url: "https://github.com/sinoru/swift-snowflake", .upToNextMinor(from: "0.0.1")),
     ],
     targets: [

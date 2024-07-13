@@ -11,23 +11,39 @@ import DiscordREST
 import WebSocketClient
 
 public final class GatewaySession: Sendable {
+    public typealias EventHandler = @Sendable (any GatewayPayloadable) async -> Void
+
     public let configuration: Configuration
     public let restSession: RESTSession
+    public let eventHandler: EventHandler
 
     let actor = Actor()
 
     public init(
         configuration: Configuration,
-        restSession: RESTSession
+        restSession: RESTSession,
+        eventHandler: @escaping EventHandler
     ) {
         self.configuration = configuration
         self.restSession = restSession
+        self.eventHandler = eventHandler
     }
 }
 
 extension GatewaySession {
-    public func connect(url: URL) async throws {
-        var urlComponents = URLComponents(url: url, resolvingAgainstBaseURL: true)!
+    public enum Encoding: String, Sendable {
+        case json
+    }
+}
+
+extension GatewaySession {
+    public func connect() async throws {
+        let gateway = try await Gateway(session: self.restSession)
+        await self.connect(to: gateway.url)
+    }
+
+    public func connect(to gatewayURL: URL) async {
+        var urlComponents = URLComponents(url: gatewayURL, resolvingAgainstBaseURL: true)!
         if urlComponents.path.isEmpty {
             urlComponents.path = "/"
         }
@@ -40,42 +56,48 @@ extension GatewaySession {
         }
         urlComponents.queryItems = queryItems
 
-        let webSocketSession = WebSocketSession(url: urlComponents.url!, configuration: .init(), delegate: self)
-        await self.actor.run {
-            $0.webSocketSession = webSocketSession
-        }
-        try await webSocketSession.connect()
-    }
+        let webSocketURL = urlComponents.url!
+        let webSocket = WebSocketClient(url: webSocketURL, configuration: .init(maxFrameSize: 1 << 20))
 
-    public func connect() async throws {
-        let gateway = try await Gateway(session: self.restSession)
-        try await self.connect(url: gateway.url)
-    }
-
-    public func disconnect() {
-        // TODO: Implement
-    }
-
-    public func send<D>(payload: GatewayPayload<D>) async throws where D: Encodable {
-        guard let webSocketSession = await actor.webSocketSession else {
-            return
-        }
-
-        let encoder: any TopLevelEncoder<Foundation.Data> = {
-            switch configuration.encoding {
-            case .json:
-                JSONEncoder.discord
+        await actor.run { actor in
+            actor.webSocketTask = Task.detached { [unowned self] in
+                await webSocketTaskMain(webSocket)
             }
-        }()
 
-        let data = try encoder.encode(payload)
-
-        try await webSocketSession.send(.string(String(decoding: data, as: UTF8.self)))
+            while actor.webSocketTask != nil && actor.state != .connected {
+                await Task.yield()
+            }
+        }
     }
-}
 
-extension GatewaySession {
-    public enum Encoding: String, Sendable {
-        case json
+    public func run() async throws {
+        try await connect()
+        try await actor.webSocketTask?.value
+    }
+
+    private func webSocketTaskMain(_ webSocket: WebSocketClient) async {
+        do {
+            await actor.updateState(.connecting)
+            try await webSocket.connect { inbound, outbound in
+                await actor.run { actor in
+                    actor.outbound = outbound
+                    actor.state = .connected
+                }
+
+                for try await webSocketResponse in inbound {
+                    debugPrint(webSocketResponse)
+                    await handleWebSocketResponse(webSocketResponse)
+                }
+
+                await actor.run { actor in
+                    actor.outbound = nil
+                    actor.state = .disconnected
+                }
+            }
+
+            await actor.reset()
+        } catch {
+            debugPrint(error)
+        }
     }
 }

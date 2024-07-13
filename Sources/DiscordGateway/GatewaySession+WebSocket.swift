@@ -10,58 +10,103 @@ import Foundation
 import DiscordCore
 import WebSocketClient
 
-extension GatewaySession: WebSocketSessionDelegate {
-    public func didReceiveMessage(_ message: WebSocketSession.Message, context: Context) {
-        Task {
-            do {
-                let jsonDecoder = JSONDecoder()
-                let data: Foundation.Data = {
-                    switch message {
-                    case .string(let string):
-                        return .init(string.utf8)
-                    case .data(let data):
-                        return .init(data)
-                        // TODO: Handle compression.
-                    }
-                }()
-                let payload = try jsonDecoder.decode(GatewayShallowPayload.self, from: data)
-                if let sequence = payload.sequence {
-                    await self.actor.updateSequence(sequence)
-                }
-
-                switch payload.opcode {
-                case .hello:
-                    let payload = try JSONDecoder.discord.decode(GatewayPayload<Hello>.self, from: data)
-                    if let heartbeatInterval = payload.data?.heartbeatInterval {
-                        await self.actor.run {
-                            $0.heartbeatInterval = heartbeatInterval
-                        }
-                        print("heartbeat interval set to \(heartbeatInterval) secs.")
-                    }
-                    await self.actor.stopHeartbeatTimer()
-                    await self.actor.startHeartbeatTimer(interval: self.actor.heartbeatInterval, session: self)
-                    try await identify()
-                case .heartbeatACK:
-                    await self.actor.stopHeartbeatTimer()
-                    await self.actor.startHeartbeatTimer(interval: self.actor.heartbeatInterval, session: self)
-                    print(payload.opcode)
-                default:
-                    dump(message)
-                }
-            } catch {
-                debugPrint(error)
+extension GatewaySession {
+    func handleWebSocketResponse(_ webSocketResponse: WebSocketClient.Response) async {
+        do {
+            let data: Data
+            switch webSocketResponse.data {
+            case .ping(let string):
+                data = Data(string.utf8)
+            case .text(let string):
+                data = Data(string.utf8)
+            case .binary(let buffer):
+                data = Data(buffer)
+            case .close:
+                return
+            case nil:
+                dump(webSocketResponse.frame)
+                return
             }
+
+            let payload = try JSONDecoder.discord.decode(GatewayShallowPayload.self, from: data)
+            if let sequence = payload.sequence {
+                await self.actor.updateSequence(sequence)
+            }
+
+            switch payload.opcode {
+            case .hello:
+                let payload = try JSONDecoder.discord.decode(GatewayPayload<Hello>.self, from: data)
+                if let heartbeatInterval = payload.data?.heartbeatInterval {
+                    await self.actor.run {
+                        $0.heartbeatInterval = heartbeatInterval
+                    }
+                    print("heartbeat interval set to \(heartbeatInterval) secs.")
+                }
+                await self.actor.stopHeartbeatTimer()
+                await self.actor.startHeartbeatTimer(interval: self.actor.heartbeatInterval, session: self)
+                try await identify()
+            case .heartbeatACK:
+                await self.actor.stopHeartbeatTimer()
+                await self.actor.startHeartbeatTimer(interval: self.actor.heartbeatInterval, session: self)
+                print(payload.opcode)
+            case .dispatch:
+                await self.actor.run { actor in
+                    actor.state = .ready
+                }
+            default:
+                dump(webSocketResponse.data)
+            }
+        } catch {
+            debugPrint(error)
         }
     }
 
-    public func didClose(context: Context) {
-        Task {
-            await self.actor.run {
-                $0.stopHeartbeatTimer()
-                $0.heartbeatInterval = .infinity
-                $0.sequence = nil
+}
+
+extension GatewaySession {
+    public func send<D>(payload: GatewayPayload<D>, waitsForReady: Bool = true) async throws where D: Encodable {
+        let encoder: any TopLevelEncoder<Foundation.Data> = {
+            switch configuration.encoding {
+            case .json:
+                JSONEncoder.discord
             }
+        }()
+
+        let data = try encoder.encode(payload)
+
+        let outbound = await actor.run { actor in
+            if waitsForReady {
+                while actor.webSocketTask != nil && actor.state != .ready {
+                    await Task.yield()
+                }
+            } else {
+                while actor.webSocketTask != nil && actor.state == .connecting {
+                    await Task.yield()
+                }
+            }
+
+            return actor.outbound
         }
+
+        try await outbound?.write(.text(String(decoding: data, as: UTF8.self)))
+    }
+}
+
+extension GatewaySession {
+    public func updatePresence(idleSince: Date? = nil, activities: [Activity], status: PresenceUpdate.Status, afk: Bool) async throws {
+        let payload =
+            GatewayPayload(
+                opcode: .presenceUpdate,
+                data: PresenceUpdate(
+                    sinceDate: idleSince,
+                    activities: activities,
+                    status: status,
+                    afk: afk
+                ),
+                sequence: nil,
+                type: nil)
+
+        try await send(payload: payload)
     }
 }
 
@@ -74,7 +119,7 @@ extension GatewaySession {
             type: nil
         )
 
-        try await send(payload: payload)
+        try await send(payload: payload, waitsForReady: false)
     }
 
     func identify() async throws {
@@ -95,6 +140,6 @@ extension GatewaySession {
                 sequence: nil,
                 type: nil)
 
-        try await send(payload: payload)
+        try await send(payload: payload, waitsForReady: false)
     }
 }
