@@ -45,17 +45,8 @@ extension RESTSession {
             request.setValue([oAuth2Credential.tokenType, oAuth2Credential.accessToken].joined(separator: " "), forHTTPHeaderField: "Authorization")
         }
 
-        #if !canImport(FoundationNetworking)
-        let (data, response) = try await { () -> (Data, URLResponse) in
-            if #available(iOS 15.0, macOS 13.0, macCatalyst 15.0, tvOS 15.0, watchOS 8.0, *) {
-                return try await urlSession.data(for: request)
-            } else {
-                return try await urlSession._data(for: request)
-            }
-        }()
-        #else
-        let (data, response) = try await urlSession._data(for: request)
-        #endif
+        let (data, response) = try await urlSession.data(for: request)
+
         switch (response as? HTTPURLResponse)?.statusCode ?? .zero {
         case 429:  // TOO MANY REQUESTS
             if let error = try? JSONDecoder.discord.decode(RateLimitError.self, from: data) {
