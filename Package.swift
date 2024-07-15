@@ -21,7 +21,7 @@ let package = Package(
             targets: ["DiscordREST"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/sinoru/swift-websocket-client.git", from: "0.1.0"),
+        .package(url: "https://github.com/sinoru/swift-websocket-client.git", from: "0.1.1"),
         .package(url: "https://github.com/sinoru/swift-snowflake", .upToNextMinor(from: "0.0.1")),
     ],
     targets: [
@@ -57,14 +57,14 @@ let package = Package(
         .target(
             name: "DiscordGateway",
             dependencies: [
-                .product(name: "WebSocketClient", package: "swift-websocket-client"),
+                .product(name: "WebSocketClientFoundationCompat", package: "swift-websocket-client"),
                 "DiscordCore",
                 "DiscordREST",
             ]),
         .target(
             name: "DiscordVoice",
             dependencies: [
-                .product(name: "WebSocketClient", package: "swift-websocket-client"),
+                .product(name: "WebSocketClientFoundationCompat", package: "swift-websocket-client"),
                 "DiscordCore",
                 "DiscordREST",
                 "Clibavformat",

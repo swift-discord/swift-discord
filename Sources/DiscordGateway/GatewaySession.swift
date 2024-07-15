@@ -8,7 +8,7 @@
 import Foundation
 import DiscordCore
 import DiscordREST
-import WebSocketClient
+import WebSocketClientFoundationCompat
 
 public final class GatewaySession: Sendable {
     public typealias EventHandler = @Sendable (any GatewayPayloadable) async -> Void
@@ -39,10 +39,10 @@ extension GatewaySession {
 extension GatewaySession {
     public func connect() async throws {
         let gateway = try await Gateway(session: self.restSession)
-        await self.connect(to: gateway.url)
+        try await self.connect(to: gateway.url)
     }
 
-    public func connect(to gatewayURL: URL) async {
+    public func connect(to gatewayURL: URL) async throws {
         var urlComponents = URLComponents(url: gatewayURL, resolvingAgainstBaseURL: true)!
         if urlComponents.path.isEmpty {
             urlComponents.path = "/"
@@ -57,7 +57,9 @@ extension GatewaySession {
         urlComponents.queryItems = queryItems
 
         let webSocketURL = urlComponents.url!
-        let webSocket = WebSocketClient(url: webSocketURL, configuration: .init(maxFrameSize: 1 << 20))
+        guard let webSocket = WebSocketClient(url: webSocketURL, configuration: .init(maxFrameSize: 1 << 20)) else {
+            throw Error.invalidGatewayURL
+        }
 
         await actor.run { actor in
             actor.webSocketTask = Task.detached { [unowned self] in

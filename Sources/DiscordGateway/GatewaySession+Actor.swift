@@ -12,7 +12,7 @@ import WebSocketClient
 extension GatewaySession {
     actor Actor {
         var state: State = .disconnected
-        var webSocketTask: Task<Void, Error>?
+        var webSocketTask: Task<Void, Swift.Error>?
         var heartbeatInterval: TimeInterval = .leastNormalMagnitude
         var sequence: Int? = nil
         var heartbeatTimer: DispatchSourceTimer? = nil
