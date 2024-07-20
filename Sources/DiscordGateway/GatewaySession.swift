@@ -74,7 +74,14 @@ extension GatewaySession {
 
     public func run() async throws {
         try await connect()
-        try await actor.webSocketTask?.value
+
+        try await withTaskCancellationHandler {
+            try await actor.webSocketTask?.value
+        } onCancel: {
+            Task(priority: .high) {
+                await actor.webSocketTask?.cancel()
+            }
+        }
     }
 
     private func webSocketTaskMain(_ webSocket: WebSocketClient) async {
