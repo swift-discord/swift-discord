@@ -8,6 +8,7 @@
 import Foundation
 import Dispatch
 import WebSocketClient
+import DiscordCore
 
 extension GatewaySession {
     actor Actor {
@@ -17,6 +18,7 @@ extension GatewaySession {
         var sequence: Int? = nil
         var heartbeatTimer: DispatchSourceTimer? = nil
         var outbound: WebSocketClient.Outbound? = nil
+        var eventHandlers: Set<Weak<EventHandler>> = []
 
         deinit {
             webSocketTask?.cancel()
@@ -45,7 +47,6 @@ extension GatewaySession.Actor {
             self.sequence = sequence
         }
     }
-
 }
 
 extension GatewaySession.Actor {

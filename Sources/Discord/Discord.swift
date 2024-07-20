@@ -7,3 +7,4 @@
 
 @_exported import DiscordREST
 @_exported import DiscordGateway
+@_exported import DiscordVoice

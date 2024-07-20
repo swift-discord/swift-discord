@@ -12,7 +12,7 @@ import FoundationNetworking
 import DiscordCore
 
 extension RESTSession {
-    public struct Configuration {
+    public struct Configuration: Sendable {
         public let urlSessionConfiguration: URLSessionConfiguration
 
         public let apiVersion: DiscordAPIVersion?

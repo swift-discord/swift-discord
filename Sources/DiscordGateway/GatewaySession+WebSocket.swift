@@ -25,14 +25,14 @@ extension GatewaySession {
                 return
             }
 
-            let payload = try JSONDecoder.discord.decode(GatewayShallowPayload.self, from: data)
+            let payload = try JSONDecoder.discord.decode(GatewayDynamicPayload.self, from: data)
             if let sequence = payload.sequence {
                 await self.actor.updateSequence(sequence)
             }
 
             switch payload.opcode {
             case .hello:
-                let payload = try JSONDecoder.discord.decode(GatewayPayload<Hello>.self, from: data)
+                let payload = try GatewayPayload<Hello>(payload)
                 if let heartbeatInterval = payload.data?.heartbeatInterval {
                     await self.actor.run {
                         $0.heartbeatInterval = heartbeatInterval
@@ -50,7 +50,17 @@ extension GatewaySession {
                     actor.state = .ready
                 }
             default:
-                await eventHandler(payload)
+                await withTaskGroup(of: Void.self) { taskGroup in
+                    let eventHandlers = await self.actor.eventHandlers.lazy.compactMap(\.base?.eventHandler)
+
+                    for eventHandler in eventHandlers {
+                        taskGroup.addTask {
+                            await eventHandler(payload)
+                        }
+                    }
+
+                    await taskGroup.waitForAll()
+                }
             }
         } catch {
             debugPrint(error)
@@ -85,24 +95,6 @@ extension GatewaySession {
         }
 
         try await outbound?.write(.text(String(decoding: data, as: UTF8.self)))
-    }
-}
-
-extension GatewaySession {
-    public func updatePresence(idleSince: Date? = nil, activities: [Activity], status: PresenceUpdate.Status, afk: Bool) async throws {
-        let payload =
-            GatewayPayload(
-                opcode: .presenceUpdate,
-                data: PresenceUpdate(
-                    sinceDate: idleSince,
-                    activities: activities,
-                    status: status,
-                    afk: afk
-                ),
-                sequence: nil,
-                type: nil)
-
-        try await send(payload: payload)
     }
 }
 

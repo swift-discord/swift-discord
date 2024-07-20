@@ -10,11 +10,17 @@ import Foundation
 import FoundationNetworking
 #endif
 
-public actor RESTSession {
+public final class RESTSession: Sendable {
     public let configuration: Configuration
-    public private(set) var oAuth2Credential: OAuth2Credential?
+    let actor = Actor()
 
-    private nonisolated let urlSession: URLSession
+    public var oAuth2Credential: OAuth2Credential? {
+        get async {
+            await actor.oAuth2Credential
+        }
+    }
+
+    private let urlSession: URLSession
 
     public init(configuration: Configuration) {
         self.configuration = configuration
@@ -27,8 +33,8 @@ public actor RESTSession {
 }
 
 extension RESTSession {
-    public func updateOAuth2Credential(_ oAuth2Credential: OAuth2Credential?) {
-        self.oAuth2Credential = oAuth2Credential
+    public func updateOAuth2Credential(_ oAuth2Credential: OAuth2Credential?) async {
+        await actor.updateOAuth2Credential(oAuth2Credential)
     }
 }
 
@@ -36,7 +42,7 @@ extension RESTSession {
     public func data(for request: URLRequest, includesOAuth2Credential: Bool = false) async throws -> (Data, URLResponse) {
         var request = request
 
-        if includesOAuth2Credential, let oAuth2Credential = oAuth2Credential {
+        if includesOAuth2Credential, let oAuth2Credential = await actor.oAuth2Credential {
             guard oAuth2Credential.isValid else {
                 try await refreshOAuth2Credential()
                 return try await data(for: request, includesOAuth2Credential: includesOAuth2Credential)

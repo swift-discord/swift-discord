@@ -6,17 +6,9 @@
 //
 
 import DiscordCore
+import Foundation
 
-public protocol GatewayPayloadable<Data>  {
-    associatedtype Data
-
-    var opcode: GatewayOpcode { get }
-    var data: Data? { get }
-    var sequence: Int? { get }
-    var type: String? { get }
-}
-
-public struct GatewayPayload<Data>: GatewayPayloadable {
+public struct GatewayPayload<Data: Codable>: Codable {
     public let opcode: GatewayOpcode
     public let data: Data?
     public let sequence: Int?
@@ -32,12 +24,10 @@ extension GatewayPayload {
     }
 }
 
-extension GatewayPayload: Decodable where Data: Decodable {
-
-}
-
-extension GatewayPayload: Encodable where Data: Encodable {
-
-}
-
 public typealias GatewayDynamicPayload = GatewayPayload<JSONValue>
+
+extension GatewayPayload {
+    public init<T: Codable>(_ gatewayPayload: GatewayPayload<T>) throws {
+        self = try JSONDecoder.discord.decode(Self.self, from: JSONEncoder.discord.encode(gatewayPayload))
+    }
+}
