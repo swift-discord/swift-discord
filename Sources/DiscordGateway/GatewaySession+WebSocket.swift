@@ -21,10 +21,7 @@ extension GatewaySession {
                 data = Data(string.utf8)
             case .binary(let buffer):
                 data = Data(buffer)
-            case .close:
-                return
-            case nil:
-                dump(webSocketResponse.frame)
+            case .close, nil:
                 return
             }
 
@@ -40,7 +37,6 @@ extension GatewaySession {
                     await self.actor.run {
                         $0.heartbeatInterval = heartbeatInterval
                     }
-                    print("heartbeat interval set to \(heartbeatInterval) secs.")
                 }
                 await self.actor.stopHeartbeatTimer()
                 await self.actor.startHeartbeatTimer(interval: self.actor.heartbeatInterval, session: self)
@@ -54,7 +50,7 @@ extension GatewaySession {
                     actor.state = .ready
                 }
             default:
-                dump(webSocketResponse.data)
+                await eventHandler(payload)
             }
         } catch {
             debugPrint(error)
