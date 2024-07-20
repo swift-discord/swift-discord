@@ -99,24 +99,6 @@ extension GatewaySession {
 }
 
 extension GatewaySession {
-    public func updatePresence(idleSince: Date? = nil, activities: [Activity], status: PresenceUpdate.Status, afk: Bool) async throws {
-        let payload =
-            GatewayPayload(
-                opcode: .presenceUpdate,
-                data: PresenceUpdate(
-                    sinceDate: idleSince,
-                    activities: activities,
-                    status: status,
-                    afk: afk
-                ),
-                sequence: nil,
-                type: nil)
-
-        try await send(payload: payload)
-    }
-}
-
-extension GatewaySession {
     func heartbeat() async throws {
         let payload = await GatewayPayload<Int64>(
             opcode: .heartbeat,
