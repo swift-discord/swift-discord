@@ -25,3 +25,21 @@ extension GatewaySession {
         try await send(payload: payload)
     }
 }
+
+extension GatewaySession {
+    public func updateVoiceState(for guildID: Snowflake, channelID: Snowflake? = nil, selfMute: Bool, selfDeaf: Bool) async throws {
+        let payload =
+            GatewayPayload(
+                opcode: .presenceUpdate,
+                data: UpdateVoiceState(
+                    guildID: guildID,
+                    channelID: channelID,
+                    selfMute: selfMute,
+                    selfDeaf: selfDeaf
+                ),
+                sequence: nil,
+                type: nil)
+
+        try await send(payload: payload)
+    }
+}
