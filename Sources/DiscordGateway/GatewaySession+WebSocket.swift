@@ -25,14 +25,14 @@ extension GatewaySession {
                 return
             }
 
-            let payload = try JSONDecoder.discord.decode(GatewayShallowPayload.self, from: data)
+            let payload = try JSONDecoder.discord.decode(GatewayDynamicPayload.self, from: data)
             if let sequence = payload.sequence {
                 await self.actor.updateSequence(sequence)
             }
 
             switch payload.opcode {
             case .hello:
-                let payload = try JSONDecoder.discord.decode(GatewayPayload<Hello>.self, from: data)
+                let payload = try GatewayPayload<Hello>(payload)
                 if let heartbeatInterval = payload.data?.heartbeatInterval {
                     await self.actor.run {
                         $0.heartbeatInterval = heartbeatInterval
