@@ -110,7 +110,7 @@ extension RESTSession {
 
         let (data, _) = try await data(for: tokenURLRequest, includesOAuth2Credential: false)
 
-        try updateOAuth2Credential(JSONDecoder.discord.decode(OAuth2Credential.self, from: data))
+        try await updateOAuth2Credential(JSONDecoder.discord.decode(OAuth2Credential.self, from: data))
     }
 
     public func refreshOAuth2Credential() async throws {
@@ -126,7 +126,7 @@ extension RESTSession {
             throw OAuth2AuthorizeError.clientSecretNotFound
         }
 
-        guard let refreshToken = oAuth2Credential?.refreshToken else {
+        guard let refreshToken = await actor.oAuth2Credential?.refreshToken else {
             throw OAuth2AuthorizeError.refreshTokenNotFound
         }
 
@@ -145,6 +145,6 @@ extension RESTSession {
 
         let (data, _) = try await data(for: tokenURLRequest, includesOAuth2Credential: false)
 
-        try updateOAuth2Credential(JSONDecoder.discord.decode(OAuth2Credential.self, from: data))
+        try await updateOAuth2Credential(JSONDecoder.discord.decode(OAuth2Credential.self, from: data))
     }
 }
