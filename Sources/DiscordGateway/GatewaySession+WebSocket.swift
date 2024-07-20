@@ -50,7 +50,17 @@ extension GatewaySession {
                     actor.state = .ready
                 }
             default:
-                await eventHandler(payload)
+                await withTaskGroup(of: Void.self) { taskGroup in
+                    let eventHandlers = await self.actor.eventHandlers.lazy.compactMap(\.base?.eventHandler)
+
+                    for eventHandler in eventHandlers {
+                        taskGroup.addTask {
+                            await eventHandler(payload)
+                        }
+                    }
+
+                    await taskGroup.waitForAll()
+                }
             }
         } catch {
             debugPrint(error)

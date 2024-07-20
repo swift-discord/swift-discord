@@ -11,22 +11,17 @@ import DiscordREST
 import WebSocketClientFoundationCompat
 
 public final class GatewaySession: Sendable {
-    public typealias EventHandler = @Sendable (any GatewayPayloadable) async -> Void
-
     public let configuration: Configuration
     public let restSession: RESTSession
-    public let eventHandler: EventHandler
 
     let actor = Actor()
 
     public init(
         configuration: Configuration,
-        restSession: RESTSession,
-        eventHandler: @escaping EventHandler
+        restSession: RESTSession
     ) {
         self.configuration = configuration
         self.restSession = restSession
-        self.eventHandler = eventHandler
     }
 }
 
