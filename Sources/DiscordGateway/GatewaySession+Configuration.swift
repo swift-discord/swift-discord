@@ -10,9 +10,9 @@ import DiscordREST
 
 extension GatewaySession {
     public struct Configuration: Sendable {
-        public let apiVersion: DiscordAPIVersion?
-        public let encoding: Encoding
-        public let osInfo: String = {
+        public var apiVersion: DiscordAPIVersion?
+        public var encoding: Encoding
+        public var osInfo: String = {
             #if os(iOS)
             return "iOS"
             #elseif os(macOS)
@@ -31,19 +31,22 @@ extension GatewaySession {
             return "Unknown"
             #endif
         }()
-        public let browserInfo: String
-        public let deviceInfo: String
+        public var browserInfo: String
+        public var deviceInfo: String
+        public var intents: Intents
 
         public init(
             apiVersion: DiscordAPIVersion? = nil,
             encoding: Encoding,
             browserInfo: String = "swift-discord",
-            deviceInfo: String = "swift-discord"
+            deviceInfo: String = "swift-discord",
+            intents: Intents = []
         ) {
             self.apiVersion = apiVersion
             self.encoding = encoding
             self.browserInfo = browserInfo
             self.deviceInfo = deviceInfo
+            self.intents = intents
         }
     }
 }

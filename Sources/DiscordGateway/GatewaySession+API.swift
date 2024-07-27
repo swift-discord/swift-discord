@@ -30,7 +30,7 @@ extension GatewaySession {
     public func updateVoiceState(for guildID: Snowflake, channelID: Snowflake? = nil, selfMute: Bool, selfDeaf: Bool) async throws {
         let payload =
             GatewayPayload(
-                opcode: .presenceUpdate,
+                opcode: .voiceStatusUpdate,
                 data: UpdateVoiceState(
                     guildID: guildID,
                     channelID: channelID,

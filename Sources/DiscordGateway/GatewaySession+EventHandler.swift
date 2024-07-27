@@ -6,15 +6,21 @@
 //
 
 extension GatewaySession {
-    public class EventHandler: Identifiable {
-        private(set) var eventHandler: (@Sendable (GatewayDynamicPayload) async -> Void)?
+    public actor EventHandler: Identifiable {
+        private(set) var eventHandler: ((GatewayDynamicPayload) async -> Void)?
 
         init(eventHandler: @escaping @Sendable (GatewayDynamicPayload) async -> Void) {
             self.eventHandler = eventHandler
         }
 
-        public func invalidate() {
+        private func _invalidate() {
             eventHandler = nil
+        }
+
+        public nonisolated func invalidate() {
+            Task(priority: .high) {
+                await _invalidate()
+            }
         }
     }
 
@@ -44,7 +50,7 @@ extension GatewaySession.EventHandler: Equatable {
 }
 
 extension GatewaySession.EventHandler: Hashable {
-    public func hash(into hasher: inout Hasher) {
+    public nonisolated func hash(into hasher: inout Hasher) {
         hasher.combine(id)
     }
 }

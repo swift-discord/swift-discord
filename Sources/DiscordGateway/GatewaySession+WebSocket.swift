@@ -13,60 +13,56 @@ import WebSocketClient
 extension GatewaySession {
     func handleWebSocketResponse(_ webSocketResponse: WebSocketClient.Response) async {
         do {
-            let data: Data
-            switch webSocketResponse.data {
-            case .ping(let string):
-                data = Data(string.utf8)
-            case .text(let string):
-                data = Data(string.utf8)
-            case .binary(let buffer):
-                data = Data(buffer)
-            case .close, nil:
-                return
-            }
+            try await withThrowingTaskGroup(of: Void.self) { taskGroup in
+                async let eventHandlers = await self.actor.eventHandlers.lazy.compactMap(\.base?)
 
-            let payload = try JSONDecoder.discord.decode(GatewayDynamicPayload.self, from: data)
-            if let sequence = payload.sequence {
-                await self.actor.updateSequence(sequence)
-            }
+                let data: Data
+                switch webSocketResponse.data {
+                case .ping(let string):
+                    data = Data(string.utf8)
+                case .text(let string):
+                    data = Data(string.utf8)
+                case .binary(let buffer):
+                    data = Data(buffer)
+                case .close, nil:
+                    return
+                }
 
-            switch payload.opcode {
-            case .hello:
-                let payload = try GatewayPayload<Hello>(payload)
-                if let heartbeatInterval = payload.data?.heartbeatInterval {
-                    await self.actor.run {
-                        $0.heartbeatInterval = heartbeatInterval
+                let payload = try JSONDecoder.discord.decode(GatewayDynamicPayload.self, from: data)
+                for eventHandler in await eventHandlers {
+                    taskGroup.addTask {
+                        await eventHandler.eventHandler?(payload)
                     }
                 }
-                await self.actor.stopHeartbeatTimer()
-                await self.actor.startHeartbeatTimer(interval: self.actor.heartbeatInterval, session: self)
-                try await identify()
-            case .heartbeatACK:
-                await self.actor.stopHeartbeatTimer()
-                await self.actor.startHeartbeatTimer(interval: self.actor.heartbeatInterval, session: self)
-                print(payload.opcode)
-            case .dispatch:
-                await self.actor.run { actor in
-                    actor.state = .ready
-                }
-            default:
-                await withTaskGroup(of: Void.self) { taskGroup in
-                    let eventHandlers = await self.actor.eventHandlers.lazy.compactMap(\.base?.eventHandler)
 
-                    for eventHandler in eventHandlers {
-                        taskGroup.addTask {
-                            await eventHandler(payload)
-                        }
+                if let sequence = payload.sequence {
+                    await self.actor.updateSequence(sequence)
+                }
+
+                switch payload.opcode {
+                case .hello:
+                    let payload = try GatewayPayload<Hello>(payload)
+                    await self.actor.updateHeartbeatInterval(payload.data.heartbeatInterval)
+                    await self.actor.stopHeartbeatTimer()
+                    await self.actor.startHeartbeatTimer(session: self)
+                    try await identify()
+                case .heartbeatACK:
+                    await self.actor.stopHeartbeatTimer()
+                    await self.actor.startHeartbeatTimer(session: self)
+                case .dispatch:
+                    await self.actor.run { actor in
+                        actor.state = .ready
                     }
-
-                    await taskGroup.waitForAll()
+                default:
+                    break
                 }
+
+                try await taskGroup.waitForAll()
             }
         } catch {
             debugPrint(error)
         }
     }
-
 }
 
 extension GatewaySession {
@@ -100,7 +96,7 @@ extension GatewaySession {
 
 extension GatewaySession {
     func heartbeat() async throws {
-        let payload = await GatewayPayload<Int64>(
+        let payload = await GatewayPayload<Int64?>(
             opcode: .heartbeat,
             data: actor.sequence.flatMap({.init($0)}),
             sequence: nil,
@@ -124,7 +120,7 @@ extension GatewaySession {
                         os: configuration.osInfo,
                         browser: configuration.browserInfo,
                         device: configuration.deviceInfo),
-                    intents: [.guilds, .guildMessages]),
+                    intents: configuration.intents),
                 sequence: nil,
                 type: nil)
 

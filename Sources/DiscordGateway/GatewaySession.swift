@@ -89,7 +89,6 @@ extension GatewaySession {
                 }
 
                 for try await webSocketResponse in inbound {
-                    debugPrint(webSocketResponse)
                     await handleWebSocketResponse(webSocketResponse)
                 }
 

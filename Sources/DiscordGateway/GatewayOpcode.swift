@@ -5,7 +5,7 @@
 //  Created by Jaehong Kang on 2022/07/22.
 //
 
-public enum GatewayOpcode: Int, Codable {
+public enum GatewayOpcode: Int, Equatable, Hashable, Codable, Sendable {
     case dispatch = 0
     case heartbeat
     case identify

@@ -1,60 +1,47 @@
 //
-//  GatewaySession+Actor.swift
+//  VoiceSession+Actor.swift
 //
 //
-//  Created by Jaehong Kang on 6/28/24.
+//  Created by Jaehong Kang on 7/27/24.
 //
 
 import Foundation
 import Dispatch
 import WebSocketClient
-import DiscordCore
+import Snowflake
+import DiscordGateway
 
-extension GatewaySession {
+extension VoiceSession {
     actor Actor {
+        var gatewaySessionEventHandler: GatewaySession.EventHandler?
         var state: State = .disconnected
-        var webSocketTask: Task<Void, Swift.Error>?
+        var voiceStateUpdate: VoiceStateUpdate?
+        var voiceServerUpdate: VoiceServerUpdate?
         var heartbeatInterval: Int = .max
-        var sequence: Int? = nil
         var heartbeatTimer: DispatchSourceTimer? = nil
+        var webSocketTask: Task<Void, Swift.Error>?
         var outbound: WebSocketClient.Outbound? = nil
-        var eventHandlers: Set<Weak<EventHandler>> = []
-
-        deinit {
-            webSocketTask?.cancel()
-        }
     }
 }
 
-extension GatewaySession.Actor {
-    func updateState(_ state: GatewaySession.State) {
+extension VoiceSession.Actor {
+    func updateState(_ state: VoiceSession.State) {
         self.state = state
     }
 
     func reset() {
         self.stopHeartbeatTimer()
         self.heartbeatInterval = .max
-        self.sequence = nil
         self.webSocketTask = nil
     }
 }
 
-extension GatewaySession.Actor {
-    func updateSequence(_ sequence: Int) {
-        if let oldSequence = self.sequence {
-            self.sequence = max(oldSequence, sequence)
-        } else {
-            self.sequence = sequence
-        }
-    }
-}
-
-extension GatewaySession.Actor {
+extension VoiceSession.Actor {
     func updateHeartbeatInterval(_ interval: Int) {
         heartbeatInterval = interval
     }
 
-    func startHeartbeatTimer(session: GatewaySession) {
+    func startHeartbeatTimer(session: VoiceSession) {
         guard heartbeatTimer == nil else {
             return
         }

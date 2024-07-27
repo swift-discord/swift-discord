@@ -8,9 +8,9 @@
 import DiscordCore
 import Foundation
 
-public struct GatewayPayload<Data: Codable>: Codable {
+public struct GatewayPayload<Data>: GatewayPayloadable {
     public let opcode: GatewayOpcode
-    public let data: Data?
+    public let data: Data
     public let sequence: Int?
     public let type: String?
 }
@@ -24,10 +24,16 @@ extension GatewayPayload {
     }
 }
 
-public typealias GatewayDynamicPayload = GatewayPayload<JSONValue>
+extension GatewayPayload: Equatable where Data: Equatable { }
+extension GatewayPayload: Hashable where Data: Hashable { }
+extension GatewayPayload: Sendable where Data: Sendable { }
+extension GatewayPayload: Encodable where Data: Encodable { }
+extension GatewayPayload: Decodable where Data: Decodable { }
 
-extension GatewayPayload {
-    public init<T: Codable>(_ gatewayPayload: GatewayPayload<T>) throws {
+public typealias GatewayDynamicPayload = GatewayPayload<JSONValue?>
+
+extension GatewayPayload where Data: Decodable {
+    public init<T: Encodable>(_ gatewayPayload: GatewayPayload<T>) throws {
         self = try JSONDecoder.discord.decode(Self.self, from: JSONEncoder.discord.encode(gatewayPayload))
     }
 }

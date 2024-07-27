@@ -8,5 +8,11 @@
 extension VoiceSession {
     public struct Configuration: Sendable {
         public var voiceAPIVersion: DiscordVoiceAPIVersion?
+
+        public init(
+            voiceAPIVersion: DiscordVoiceAPIVersion? = nil
+        ) {
+            self.voiceAPIVersion = voiceAPIVersion
+        }
     }
 }
