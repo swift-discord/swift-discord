@@ -8,6 +8,7 @@
 extension VoiceSession {
     enum Error: Swift.Error {
         case unknown
+        case guildVoiceStatesIntentRequired
         case invalidVoiceGatewayURL
         case notAuthenticated
     }

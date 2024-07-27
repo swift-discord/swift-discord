@@ -46,6 +46,10 @@ public final class VoiceSession: Sendable {
             return
         }
 
+        guard gatewaySession.configuration.intents.contains([.guilds, .guildVoiceStates]) else {
+            throw Error.guildVoiceStatesIntentRequired
+        }
+
         let gatewaySessionEventHandler = await gatewaySession.handleEvent { [weak self] in
             await self?.handleGatewayEvent($0)
         }
