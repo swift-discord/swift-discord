@@ -29,6 +29,7 @@ let package = Package(
     dependencies: [
         .package(url: "https://github.com/sinoru/swift-websocket-client.git", from: "0.1.1"),
         .package(url: "https://github.com/sinoru/swift-snowflake", .upToNextMinor(from: "0.0.1")),
+        .package(url: "https://github.com/sinoru/swift-rtp", from: "0.0.1"),
     ],
     targets: [
         // Targets are the basic building blocks of a package, defining a module or a test suite.
@@ -71,6 +72,7 @@ let package = Package(
             name: "DiscordVoice",
             dependencies: [
                 .product(name: "WebSocketClientFoundationCompat", package: "swift-websocket-client"),
+                .product(name: "RTP", package: "swift-rtp"),
                 "DiscordCore",
                 "DiscordGateway",
                 "Clibavformat",

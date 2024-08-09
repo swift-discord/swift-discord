@@ -11,6 +11,7 @@ import AsyncAlgorithms
 import Foundation
 import Snowflake
 import WebSocketClientFoundationCompat
+import RTP
 
 public final class VoiceSession: Sendable {
     public let configuration: Configuration
