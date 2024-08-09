@@ -37,6 +37,7 @@ extension VoiceSession {
                 await self.actor.stopHeartbeatTimer()
                 await self.actor.startHeartbeatTimer(session: self)
             case .ready:
+                let payload = try VoiceGatewayPayload<VoiceReady>(payload)
                 await self.actor.run { actor in
                     actor.state = .ready
                 }
