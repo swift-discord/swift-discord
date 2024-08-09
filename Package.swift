@@ -27,8 +27,10 @@ let package = Package(
             targets: ["DiscordVoice"]),
     ],
     dependencies: [
+        .package(url: "https://github.com/apple/swift-nio.git", from: "2.67.0"),
+        .package(url: "https://github.com/apple/swift-nio-transport-services.git", from: "1.21.0"),
         .package(url: "https://github.com/sinoru/swift-websocket-client.git", from: "0.1.1"),
-        .package(url: "https://github.com/sinoru/swift-snowflake", .upToNextMinor(from: "0.0.1")),
+        .package(url: "https://github.com/sinoru/swift-snowflake", from: "0.0.1"),
         .package(url: "https://github.com/sinoru/swift-rtp", from: "0.0.1"),
     ],
     targets: [
@@ -71,6 +73,12 @@ let package = Package(
         .target(
             name: "DiscordVoice",
             dependencies: [
+                .product(name: "NIOCore", package: "swift-nio"),
+                .product(name: "NIOPosix", package: "swift-nio"),
+                .product(
+                    name: "NIOTransportServices",
+                    package: "swift-nio-transport-services",
+                    condition: .when(platforms: [.macOS, .macCatalyst, .iOS, .tvOS, .watchOS, .visionOS])),
                 .product(name: "WebSocketClientFoundationCompat", package: "swift-websocket-client"),
                 .product(name: "RTP", package: "swift-rtp"),
                 "DiscordCore",
