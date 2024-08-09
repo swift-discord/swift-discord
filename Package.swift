@@ -43,7 +43,7 @@ let package = Package(
         ),
         .systemLibrary(
             name: "Clibavcodec",
-            pkgConfig: "Clibavcodec",
+            pkgConfig: "libavcodec",
             providers: [
                 .brew(["ffmpeg"]),
                 .apt(["libavcodec-dev"])
